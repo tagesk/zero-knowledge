@@ -1,0 +1,1288 @@
+%%
+%% Copyright (C) 2024-2026 Anders Andersen, UiT The Arctic University of Norway
+%%
+%% This file may be distributed and/or modified under the conditions of the
+%% LaTeX Project Public License, either version 1.3c of this license or (at
+%% your option) any later version. The latest version of this license is in
+%%
+%%     http://www.latex-project.org/lppl.txt
+%%
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008-05-04 or later.
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+%%
+%% The `aspen` package for simple crypto notation in LaTeX
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RequirePackage{rcs}
+\RCS$Date: 2026/05/12 09:54:24 $
+\RCS$RCSfile: aspen.sty,v $
+\RCS$Revision: 2.5 $
+\RCS$Author: aa $
+%\typeout{Package: `aspen' v\RCSRevision\space <\RCSRawDate> (AA)}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{aspen}%[\RCSRawDate]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Required packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Need some help commands and symbols from other packages
+\RequirePackage[Mapstochar,Mapsto]{stmaryrd}
+\RequirePackage{mathtools}
+\RequirePackage{ifthen}
+\RequirePackage{suffix}
+%\RequirePackage{wasysym} % Better \leadsto
+
+
+% Need color support
+\RequirePackage[dvipsnames,x11names]{xcolor}
+
+% Use xkeyval to prosess key-val option `color` and `ban` 
+\RequirePackage{xkeyval}
+
+% Need this for string comparing, list handling and more
+\RequirePackage{etoolbox}
+% \RequirePackage{ltxcmds}
+
+% For a better underline command
+\RequirePackage[normalem]{ulem}
+\RequirePackage{contour}
+
+% Need to compare strings (lualatex: using `\pdf@strcmp` from `pdftexcmds`)
+% From https://tex.stackexchange.com/questions/391735/question-of-ifstrequal-in-etoolbox
+\newcommand{\@ifstringequal}[4]{%
+  \ifthenelse{\equal{#1}{#2}}{#3}{#4}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Option: color, color=style
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% No colors (default)
+\def\@@Val#1{#1}	% value
+\def\@@Pri#1{#1}	% principal
+\def\@@Key#1{#1}	% key
+\def\@@Nonce#1{#1}	% nonce / random
+\def\@@TS#1{#1}		% timestamp
+\def\@@Var#1{#1}	% variable
+\def\@@Str#1{#1}	% string
+\def\@@Function#1{#1}	% function
+\def\@@Cmd#1{#1}	% code
+\def\@@Label#1{#1}	% label
+\def\@@BO#1{\textcolor{black}{#1}}	% binary operator
+  
+% The default aspen colors
+\@namedef{aspen@PY@tok@no}{\def\PY@tc##1{\textcolor{violet}{##1}}}
+\@namedef{aspen@PY@tok@na}{\def\PY@tc##1{\textcolor{CadetBlue}{##1}}}%CadetBlue
+\@namedef{aspen@PY@tok@kt}{\def\PY@tc##1{\textcolor{BlueViolet}{##1}}}
+\@namedef{aspen@PY@tok@nn}{\def\PY@tc##1{\textcolor{LightPink4!90!black}{##1}}}%DodgerBlue
+\@namedef{aspen@PY@tok@nt}{\def\PY@tc##1{\textcolor{Burlywood4!90!black}{##1}}}%Khaki4
+\@namedef{aspen@PY@tok@nv}{\def\PY@tc##1{\textcolor{red!35!violet}{##1}}}
+\@namedef{aspen@PY@tok@sc}{\def\PY@tc##1{\textcolor{RedViolet}{##1}}}
+\@namedef{aspen@PY@tok@nf}{\def\PY@tc##1{\textcolor{teal}{##1}}}
+\@namedef{aspen@PY@tok@gp}{\def\PY@tc##1{\textcolor{NavyBlue}{##1}}}
+\@namedef{aspen@PY@tok@nl}{\def\PY@tc##1{\textcolor{LightSkyBlue3!85!black}{##1}}}
+\@namedef{aspen@PY@tok@err}{\def\PY@tc##1{\textcolor{Red!90!teal}{##1}}}
+%\@namedef{aspen@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.48,0.48,0.80}{##1}}}% from manni (but darker)
+
+% Introduce colors default
+\DeclareOptionX{color}[aspen]{
+  \gdef\@@Val##1{\csname #1@PY@tok@no\endcsname \PY@tc{##1}}	%value
+  \gdef\@@Pri##1{\csname #1@PY@tok@na\endcsname \PY@tc{##1}}	%principal
+  \gdef\@@Key##1{\csname #1@PY@tok@kt\endcsname \PY@tc{##1}}	%key
+  \gdef\@@Nonce##1{\csname #1@PY@tok@nn\endcsname \PY@tc{##1}}	%nonce
+  \gdef\@@TS##1{\csname #1@PY@tok@nt\endcsname \PY@tc{##1}}	%timestamp
+  \gdef\@@Var##1{\csname #1@PY@tok@nv\endcsname \PY@tc{##1}}	%variable
+  \gdef\@@Str##1{\csname #1@PY@tok@sc\endcsname \PY@tc{##1}}	%string
+  \gdef\@@Function##1{\csname #1@PY@tok@nf\endcsname \PY@tc{##1}}	%function
+  \gdef\@@Procedure##1{\csname #1@PY@tok@err\endcsname \PY@tc{##1}}	%procedure
+  \gdef\@@Cmd##1{\csname #1@PY@tok@gp\endcsname \PY@tc{##1}}	%code
+  \gdef\@@Label##1{\csname #1@PY@tok@nl\endcsname \PY@tc{##1}}	%label
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Option: ban
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BAN logic
+% From https://gist.github.com/hkkhuang/aae21285714566a5c72c68921f1add9a
+% Keke Huang | Doubleke (hkkhuang), Fujian Normal University
+% https://gist.github.com/hkkhuang/
+% But maybe originally from:
+% https://gist.github.com/psoftware/5d9860a86f12edaebe1638e0e12080a2
+% Antonio Le Caldare, psoftware www.lecaldare.com
+% https://gist.github.com/psoftware
+
+% Option updates two macros to better match font setup in `aspen-doc`
+\DeclareOptionX{ban}[tug]{%
+  \newcommand{\BANBelieves}{\ensuremath{\,\mid\equiv\,}}
+  \newcommand{\BANSees}{\ensuremath{\,\triangleleft\,}}
+  \newcommand{\BANOncesaid}{\ensuremath{\,\mid\sim\,}}
+  %\newcommand{\BANControls}{\ensuremath{\,\Rrightarrow\,}}
+  \newcommand{\BANControls}{\ensuremath{\,\Mapsto\,}}
+  \newcommand{\BANFresh}[1]{\ensuremath{\sharp(\AVal{##1})}}
+  \newcommand{\BANEncryptedwith}[2]{\ensuremath{\{\AVal{##2}\}_{\AKey*{##1}}}}
+  \newcommand{\BANCombine}[2]{\ensuremath{{\langle ##1 \rangle}_{##2}}}
+  \newcommand{\BANSharedkey}[1]{\ensuremath{\,\xleftrightarrow{\AKey*{##1}}\,}}
+  \newcommand{\BANPubkey}[1]{\ensuremath{\xmapsto{\AKey*{##1}}\,}}
+  \newcommand{\BANSecret}[1]{\ensuremath{\,\xleftrightharpoons{\AVal{##1}}\,}}
+  \@ifstringequal{#1}{aa}{%
+    \renewcommand{\BANControls}{\ensuremath{%
+        \,\raisebox{0.25pt}{\ensuremath{\Mapstochar}}\kern-2pt\Rightarrow\,}}
+    \renewcommand{\BANPubkey}[1]{%
+      \ensuremath{\mapstochar\kern 1pt\xrightarrow{\AKey*{##1}}\,}}}{}
+  \@ifstringequal{#1}{tug}{%
+    \renewcommand{\BANControls}{\ensuremath{%
+        \,\raisebox{0.0pt}{\ensuremath{\Mapstochar}}\kern-2.5pt\Rightarrow\,}}
+    \renewcommand{\BANPubkey}[1]{%
+      \ensuremath{\mapstochar\xrightarrow{\AKey*{##1}}\,}}}{}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Notation variants
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% pubkey and privkey (trad means traditional key notation)
+% This option is not recommended
+\gdef\@pubkeynotation{aspen}
+\DeclareOptionX{tradpubkey}[trad]{%
+  \gdef\@pubkeynotation{#1}}
+\gdef\@privkeynotation{aspen}
+\DeclareOptionX{tradprivkey}[trad]{%
+  \gdef\@privkeynotation{#1}}
+
+% Concatenation operator
+\newcommand{\ADotconcat}{\;\mathbin{.}\;}
+\newcommand{\ADblbarconcat}{\;\mathbin{\|}\;}
+\newcommand{\APlusconcat}{\;\mathbin{+}\;}
+\let\@Concat\ADotconcat	% Default
+\DeclareOptionX{concat}[dot]{%
+  \@ifstringequal{#1}{dot}{\global\let\@Concat\ADotconcat}{%
+    \@ifstringequal{#1}{dblbar}{\global\let\@Concat\ADblbarconcat}{%%
+      \@ifstringequal{#1}{plus}{\global\let\@Concat\APlusconcat}{}}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROCESS all options
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\ProcessOptionsX
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dumped from pygments (with unique commands for each given style)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% pygmentsstyles
+
+
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+
+\@namedef{autumn@PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.67,0.67}{##1}}}
+\@namedef{autumn@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.67,0.00}{##1}}}
+\@namedef{autumn@PY@tok@nn}{\let\PY@ul=\underline\def\PY@tc##1{\textcolor[rgb]{0.00,0.67,0.67}{##1}}}
+\@namedef{autumn@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.00,0.00}{##1}}}
+\@namedef{autumn@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.00,0.00}{##1}}}
+\@namedef{autumn@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.12,0.56,1.00}{##1}}}
+\@namedef{autumn@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.12,0.56,1.00}{##1}}}
+\@namedef{autumn@PY@tok@gp}{\def\PY@tc##1{\textcolor[rgb]{0.33,0.33,0.33}{##1}}}
+\@namedef{autumn@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}\def\PY@bc##1{{\setlength{\fboxsep}{0pt}\colorbox[rgb]{1.00,0.67,0.67}{\strut ##1}}}}
+\@namedef{autumn@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.33,0.00}{##1}}}
+
+
+\@namedef{colorful@PY@tok@kt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.20,0.20,0.60}{##1}}}
+\@namedef{colorful@PY@tok@nf}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.40,0.73}{##1}}}
+\@namedef{colorful@PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.05,0.52,0.71}{##1}}}
+\@namedef{colorful@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.60,0.40,0.20}{##1}}}
+\@namedef{colorful@PY@tok@no}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.20,0.40}{##1}}}
+\@namedef{colorful@PY@tok@nl}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.60,0.47,0.00}{##1}}}
+\@namedef{colorful@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.80}{##1}}}
+\@namedef{colorful@PY@tok@nt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.47,0.00}{##1}}}
+\@namedef{colorful@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{colorful@PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.78,0.36,0.04}{##1}}}
+\@namedef{colorful@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.00}{##1}}\def\PY@bc##1{{\setlength{\fboxsep}{0pt}\colorbox[rgb]{1.00,0.67,0.67}{\strut ##1}}}}
+
+
+\@namedef{default@PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{default@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{default@PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{default@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{default@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{default@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{default@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{default@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{default@PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{default@PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{default@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+
+
+\@namedef{emacs@PY@tok@kt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.73,0.00}{##1}}}
+\@namedef{emacs@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.63,0.00}{##1}}}
+\@namedef{emacs@PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{emacs@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.72,0.53,0.04}{##1}}}
+\@namedef{emacs@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{emacs@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.63,0.00}{##1}}}
+\@namedef{emacs@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.27,0.27}{##1}}}
+\@namedef{emacs@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{emacs@PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{emacs@PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{emacs@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.27,0.27}{##1}}}
+
+
+\@namedef{friendly@PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.56,0.13,0.00}{##1}}}
+\@namedef{friendly@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.02,0.16,0.49}{##1}}}
+\@namedef{friendly@PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.05,0.52,0.71}{##1}}}
+\@namedef{friendly@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.38,0.84}{##1}}}
+\@namedef{friendly@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.38,0.68,0.84}{##1}}}
+\@namedef{friendly@PY@tok@nl}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.13,0.44}{##1}}}
+\@namedef{friendly@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{##1}}}
+\@namedef{friendly@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.02,0.16,0.45}{##1}}}
+\@namedef{friendly@PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.78,0.36,0.04}{##1}}}
+\@namedef{friendly@PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{friendly@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.25,0.44,0.63}{##1}}}
+
+
+\@namedef{fruity@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.98,0.40,0.04}{##1}}}
+\@namedef{fruity@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.98,0.40,0.04}{##1}}}
+\@namedef{fruity@PY@tok@na}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.53}{##1}}}
+\@namedef{fruity@PY@tok@nf}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{1.00,0.00,0.53}{##1}}}
+\@namedef{fruity@PY@tok@kt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.79,0.66}{##1}}}
+\@namedef{fruity@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.53,0.82}{##1}}}
+\@namedef{fruity@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{1.00,1.00,1.00}{##1}}}
+\@namedef{fruity@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{1.00,1.00,1.00}{##1}}}
+\@namedef{fruity@PY@tok@nn}{\def\PY@tc##1{\textcolor[rgb]{1.00,1.00,1.00}{##1}}}
+\@namedef{fruity@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.53,0.82}{##1}}}
+\@namedef{fruity@PY@tok@gp}{\def\PY@tc##1{\textcolor[rgb]{1.00,1.00,1.00}{##1}}}
+
+
+\@namedef{gruvboxlight@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.03,0.40,0.47}{##1}}}
+\@namedef{gruvboxlight@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.56,0.25,0.44}{##1}}}
+\@namedef{gruvboxlight@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.26,0.48,0.35}{##1}}}
+\@namedef{gruvboxlight@PY@tok@nn}{\def\PY@tc##1{\textcolor[rgb]{0.26,0.48,0.35}{##1}}}
+\@namedef{gruvboxlight@PY@tok@nt}{\def\PY@tc##1{\textcolor[rgb]{0.26,0.48,0.35}{##1}}}
+\@namedef{gruvboxlight@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.71,0.46,0.08}{##1}}}
+\@namedef{gruvboxlight@PY@tok@gp}{\def\PY@tc##1{\textcolor[rgb]{0.49,0.44,0.39}{##1}}}
+\@namedef{gruvboxlight@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{0.98,0.95,0.78}{##1}}\def\PY@bc##1{{\setlength{\fboxsep}{0pt}\colorbox[rgb]{0.62,0.00,0.02}{\strut ##1}}}}
+\@namedef{gruvboxlight@PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.62,0.00,0.02}{##1}}}
+\@namedef{gruvboxlight@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.47,0.45,0.05}{##1}}}
+
+
+\@namedef{manni@PY@tok@kt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.47,0.53}{##1}}}
+\@namedef{manni@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.80,0.00,1.00}{##1}}}
+\@namedef{manni@PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.80,1.00}{##1}}}
+\@namedef{manni@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.20,0.20}{##1}}}
+\@namedef{manni@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.20,0.40,0.00}{##1}}}
+\@namedef{manni@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.60,0.60,1.00}{##1}}}
+\@namedef{manni@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.20,0.00,0.60}{##1}}}
+\@namedef{manni@PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.20,0.00,0.60}{##1}}}
+\@namedef{manni@PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.60}{##1}}}
+\@namedef{manni@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.00,0.00}{##1}}\def\PY@bc##1{{\setlength{\fboxsep}{0pt}\colorbox[rgb]{1.00,0.67,0.67}{\strut ##1}}}}
+\@namedef{manni@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.80,0.20,0.00}{##1}}}
+
+
+\@namedef{staroffice@PY@tok@err}{\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{staroffice@PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@nn}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@nt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.93,0.00,0.00}{##1}}}
+\@namedef{staroffice@PY@tok@gp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+
+
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Values, variables, strings, functions and commands (code)
+% The @@ methods implement the colors, and the @ methods implement the styles
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The name of the package
+\newcommand{\Aspen}{\textsc{Aspen}}
+\newcommand{\aspen}{\Aspen}
+
+% Session mark
+\def\ASmark{'}
+\def\@Smark{'}	% Backup
+
+% A value
+\def\@Val#1{\ensuremath{#1}}
+\def\AVal#1{\@@Val{\@Val{#1}}}
+
+% A principal
+\def\@Pri#1{\ensuremath{#1}}
+\def\APri#1{\@@Pri{\@Pri{#1}}}
+
+% A key
+\def\@Key#1{\ensuremath{#1}}
+\def\AKey@#1{\@@Key{\@Key{#1}}}
+
+% A nonce
+\def\@Nonce#1{\ensuremath{#1}}
+\def\ANonce@#1{\@@Nonce{\@Nonce{#1\ASmark}}}
+\NewDocumentCommand{\ANonce}{sO{N}m}{%
+  \IfBooleanTF{#1}{\ANonce@{#3}}{\ANonce@{#2_{#3}}}}
+
+% An index or counter
+\def\ACounter@#1{\@@Nonce{\@Nonce{#1}}}
+\NewDocumentCommand{\ACounter}{sO{I}m}{%
+  \IfBooleanTF{#1}{\ACounter@{#3}}{\ACounter@{#2_{#3}}}}
+
+% A random value
+\NewDocumentCommand\ARandom@{t'm}{%
+  \IfBooleanTF{#1}{}{\global\let\ASmark\empty}%
+  \ANonce*{#2}%
+  \global\let\ASmark\@Smark}
+\NewDocumentCommand\ARandom{st'O{R}m}{%
+  \IfBooleanTF{#1}{%
+    \IfBooleanTF{#2}{\ARandom@'{#4}}{\ARandom@{#4}}}{%
+    \IfBooleanTF{#2}{\ARandom@'{#3_{#4}}}{\ARandom@{#3_{#4}}}}}
+
+% A time stamp or other time related values
+\def\@TS#1{\ensuremath{#1}}
+\def\ATS@#1{\@@TS{\@TS{#1}}}
+\NewDocumentCommand{\ATS}{sO{T}m}{%
+  \IfBooleanTF{#1}{\ATS@{#3}}{\ATS@{#2_{#3}}}}
+\NewDocumentCommand{\ATTL}{sO{L}m}{%
+  \IfBooleanTF{#1}{\ATS{#3}}{\ATS@{#2_{#3}}}}
+
+% A variable
+\def\@Var#1{\ensuremath{#1}}
+\def\AVar#1{\@@Var{\@Var{#1}}}
+
+% A text string
+\def\@Str#1{\ensuremath{\textrm{``\texttt{#1}''}}}
+\def\AStr#1{\@@Str{\@Str{#1}}}
+
+% A function name
+\def\@Function#1{\ensuremath{#1}}
+\def\AFunction#1{\@@Function{\@Function{#1}}}
+
+% A procedure name
+\def\@Procedure#1{\ensuremath{#1}}
+\def\AProcedure#1{\@@Procedure{\@Procedure{#1}}}
+
+% A command (code)
+\def\@Cmd#1{\ensuremath{\texttt{#1}}}
+\def\ACmd#1{\@@Cmd{\@Cmd{#1}}}
+
+% A label
+\def\@Label#1{\ensuremath{#1}}
+\def\ALabel#1{\@@Label{\@Label{#1}}}
+
+% A references to a label
+\def\ARef#1{\@@Label{\@Label{\ref{#1}}}}
+
+% A binary operator
+\def\@BO#1{\ensuremath{\mathbin{#1}}}
+\def\ABO#1{\@@BO{\@BO{#1}}}
+
+% Unpack/show details (leadsto)
+\DeclareRobustCommand{\@Unpack}{%
+  \mathrel{\text{\usefont{U}{lasy}{m}{b}\symbol{"3B}}}}
+\def\AUnpack{\ensuremath{\@Unpack}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% Help functions/commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Parse each function argument as a value
+% Inspired by: https://tex.stackexchange.com/questions/87407/iterating-through-comma-separated-arguments
+\newcommand{\@fargs}[1]{%
+  \def\nextitem{\def\nextitem{,}}% Separator
+  \renewcommand*{\do}[1]{\nextitem\AVal{##1}}% How to process each item
+  \docsvlist{#1}}% Process list
+
+% Some scaled sizes
+\newcommand{\@ssscript}[1]{\raisebox{1.5pt}{\scalebox{.25}{$\mathbf{#1}$}}}
+\newcommand{\@sscript}[1]{\raisebox{2pt}{\scalebox{.55}{$\mathbf{#1}$}}}
+
+% Command that eat its arguments
+%\newcommand{\@Eatit}[1]{}
+\newcommand{\AEatit}[1]{\ignorespaces}
+
+% Create different sizes of parenthesis/braces/brackets
+% From https://tex.stackexchange.com/questions/389989/how-to-get-really-big-curly-braces
+\newcommand\@makebig[2]{%
+  \@xp\newcommand\@xp*\csname#1\endcsname{\bBigg@{#2}}%
+  \@xp\newcommand\@xp*\csname#1l\endcsname{\@xp\mathopen\csname#1\endcsname}%
+  \@xp\newcommand\@xp*\csname#1r\endcsname{\@xp\mathclose\csname#1\endcsname}}
+\@makebig{biggg}  {3.0}
+\@makebig{Biggg}  {3.5}
+\@makebig{bigggg} {4.0}
+\@makebig{Bigggg} {5.0}
+\@makebig{biggggg}{5.5}
+\@makebig{Biggggg}{6.0}
+
+% Help function used to handle the different sized brackets (given as an
+% optional argument in many of the commands below: big, Big, bigg, Bigg, ...)
+\newcommand{\@getbracket}[2]{%
+  % #1		-> size
+  % #2		-> bracket (type)
+  \IfNoValueTF{#1}{#2}{\csname #1\endcsname #2}}
+
+% Help function for better spaces around commas in key labels
+% https://tex.stackexchange.com/questions/225919/how-to-split-input-string-in-a-latex-command
+\protected\def\averythinspace{%
+  \ifmmode
+    \mskip0.5\thinmuskip
+  \fi}
+\def\@ascomma{,\averythinspace}
+\newcommand\@acs[1]{%
+  \let\@acomma\empty
+  \@for\tmp:=#1\do{\@acomma\tmp\let\@acomma\@ascomma}}
+
+% A better underline command for procedures (e.g. Abort)
+\newcommand{\ADefaultContour}{white}
+\NewDocumentCommand{\@Uline}{D(){\ADefaultContour}m}{%
+  \setlength{\ULdepth}{1.8pt}%
+  \contourlength{0.8pt}%
+  \uline{\phantom{#2}}\llap{\contour{#1}{#2}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The crypto notation commands
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%
+% Crypto keys: \AKey, \sharedkey, \sessionkey, \pubkey, \privkey
+%
+
+% A public key (of a public-private key pair): \pubkey / \AKey+
+% \newcommand{\@pubkey}[1]{\@key{#1}}
+\newcommand{\@newpubkey}[2]{\ensuremath{#1_{\@acs{#2}}^{\@sscript{+}}}}	% The new notation
+\newcommand{\@tradpubkey}[2]{\ensuremath{#1_{\@acs{#2}}}}		% The traditional notation
+\@ifstringequal{\@pubkeynotation}{trad}{% Choose new or traditional
+  \let\@pubkey\@tradpubkey}{\let\@pubkey\@newpubkey}
+\NewDocumentCommand{\APubkey}{O{K}m}{% The user command (use this or `\AKey+`)
+  % #1		-> Key symbol (default K)
+  % #2		-> Label of key (owner of key)
+  \AKey@{\@pubkey{#1}{#2}}}
+
+% A private key (of a public-private key pair): \ASprivkey 
+% with smaller -1 superscript (this command is rarely used)
+\newcommand{\@newsprivkey}[2]{\ensuremath{#1_{\@acs{#2}}^{\@sscript{-}}}}	% The new notation
+\newcommand{\@tradsprivkey}[2]{\ensuremath{#1_{\@acs{#2}}^{\@ssscript{-1}}}}% The traditional notation
+\@ifstringequal{\@privkeynotation}{trad}{% Choose new or traditional
+  \let\@Sprivkey\@tradsprivkey}{\let\@Sprivkey\@newsprivkey}
+\NewDocumentCommand{\ASprivkey}{O{K}m}{% The user command
+  % #1		-> Key symbol (default K)
+  % #2		-> Label of key (owner of key)
+  \AKey@{\@Sprivkey{#1}{#2}}}
+
+% A private key (of a public-private key pair): \APrivkey / \AKey-
+\newcommand{\@newprivkey}[2]{\ensuremath{#1_{\@acs{#2}}^{\@sscript{-}}}}	% The new notation
+\newcommand{\@tradprivkey}[2]{\ensuremath{#1_{\@acs{#2}}^{\@sscript{-1}}}}	% The traditional notation
+\@ifstringequal{\@privkeynotation}{trad}{% Choose new or traditional
+  \let\@Privkey\@tradprivkey}{\let\@Privkey\@newprivkey}
+\NewDocumentCommand{\APrivkey}{O{K}m}{% The user command (use this or `\AKey-`)
+  % #1		-> Key symbol (default K)
+  % #2		-> Label of key (owner of key)
+  \AKey@{\@Privkey{#1}{#2}}}
+
+% A shared (secret) key: \ASharedkey / \AKey*
+\newcommand{\@Sharedkey}[2]{%
+  \let\@sgnc\@Groupnamecmd	% To correctly typeset shared key for a group
+  \let\@Groupnamecmd\AKey@	% (typeset the group as a key, and not as a group name)
+  \ensuremath{#1_{\@acs{#2}}}%
+  \let\@Groupnamecmd\@sgnc}	% Restore group name
+\NewDocumentCommand{\ASharedkey}{O{K}m}{% The user command (use this or `\AKey*`)
+  % #1		-> Key symbol (default K)
+  % #2		-> Label of key (owner of key)
+  \AKey@{\@Sharedkey{#1}{#2}}}
+
+% A session key (a shared/secret key for a session): \ASessionkey / \AKey'
+\NewDocumentCommand{\ASessionkey}{O{K}m}{% The user command (use this or `\AKey*`)
+  % #1		-> Key symbol (default K)
+  % #2		-> Label of key (owner of key)
+  \AKey@{\@Sharedkey{#1}{#2}\ASmark}}
+
+% A key generated from a password: \APwkey / \AKey"
+\def\APwkeymarker{\raisebox{-.5ex}[0pt][-.6ex]{"}}
+\NewDocumentCommand{\APwkey}{O{K}m}{%
+  \AKey@{#1^{\APwkeymarker}_{#2}}}
+
+
+%
+% Help function used to handle the markers (used in all commands with markers)
+%
+
+% The next LaTeX command to call
+\global\let\@bckp@nextcmd@i\empty
+\global\let\@bckp@nextcmd@ii\empty
+\global\let\@bckp@nextcmd@iii\empty
+\global\let\@bckp@nextcmd@iv\empty
+\global\let\@bckp@nextcmd@v\empty
+\global\let\@bckp@nextcmd@vi\empty
+\global\let\@bckp@nextcmd@vii\empty
+\global\let\@bckp@nextcmd@viii\empty
+\global\let\@bckp@nextcmd@ix\empty
+\global\let\@bckp@nextcmd@x\empty
+
+% Shared key when no markers (default)
+\global\let\@tkey\ASharedkey
+\global\let\@bckp@tkey@i\@tkey
+\global\let\@bckp@tkey@ii\@tkey
+\global\let\@bckp@tkey@iii\@tkey
+\global\let\@bckp@tkey@iv\@tkey
+\global\let\@bckp@tkey@v\@tkey
+\global\let\@bckp@tkey@vi\@tkey
+\global\let\@bckp@tkey@vii\@tkey
+\global\let\@bckp@tkey@viii\@tkey
+\global\let\@bckp@tkey@ix\@tkey
+\global\let\@bckp@tkey@x\@tkey
+
+\newcommand{\@setmarker}[7]{% st-t+t!t't"t=
+  % #1		-> true, if marker * is used (no specific or manually specify key type)
+  % #2		-> true, if marker - is used (private key)
+  % #3		-> true, if marker + is used (public key)
+  % #4		-> true, if marker ! is used (no specific, but key of a principal/name)
+  % #5		-> true, if marker ' is used (session key)
+  % #6		-> true, if marker " is used (password key)
+  % #7		-> true, if marker = is used (magic return; do not change \@tkey)
+  % <none>	-> true, if no marker is used (secret/shared/symmetric key)
+  % Push \@nextcmd to stack
+  \global\let\@bckp@nextcmd@x\@bckp@nextcmd@ix
+  \global\let\@bckp@nextcmd@ix\@bckp@nextcmd@viii
+  \global\let\@bckp@nextcmd@viii\@bckp@nextcmd@vii
+  \global\let\@bckp@nextcmd@vii\@bckp@nextcmd@vi
+  \global\let\@bckp@nextcmd@vi\@bckp@nextcmd@v
+  \global\let\@bckp@nextcmd@v\@bckp@nextcmd@iv
+  \global\let\@bckp@nextcmd@vi\@bckp@nextcmd@iii
+  \global\let\@bckp@nextcmd@iii\@bckp@nextcmd@ii
+  \global\let\@bckp@nextcmd@ii\@bckp@nextcmd@i
+  \global\let\@bckp@nextcmd@i\@nextcmd
+  % Choose correct key
+  \IfBooleanTF{#7}{}{%
+    \global\let\@tkey\ASharedkey
+    \IfBooleanTF{#1}{\global\let\@tkey\AKey@}{%
+      \IfBooleanTF{#2}{\global\let\@tkey\APrivkey}{%
+        \IfBooleanTF{#3}{\global\let\@tkey\APubkey}{%
+          \IfBooleanTF{#4}{\global\let\@tkey\AName}{%
+            \IfBooleanTF{#5}{\global\let\@tkey\ASessionkey}{%
+              \IfBooleanT{#6}{\global\let\@tkey\APwkey}}}}}}}%
+  % Push \@tkey to stack
+  \global\let\@bckp@tkey@x\@bckp@tkey@ix
+  \global\let\@bckp@tkey@ix\@bckp@tkey@viii
+  \global\let\@bckp@tkey@viii\@bckp@tkey@vii
+  \global\let\@bckp@tkey@vii\@bckp@tkey@vi
+  \global\let\@bckp@tkey@vi\@bckp@tkey@v
+  \global\let\@bckp@tkey@v\@bckp@tkey@iv
+  \global\let\@bckp@tkey@iv\@bckp@tkey@iii
+  \global\let\@bckp@tkey@iii\@bckp@tkey@ii
+  \global\let\@bckp@tkey@ii\@bckp@tkey@i
+  \global\let\@bckp@tkey@i\@tkey}
+
+% Restore key type (should also work for nested commands)
+\newcommand{\@restoremarker}{%
+  % Pop \@nextcmd from stack
+  \global\let\@bckp@nextcmd@i\@bckp@nextcmd@ii
+  \global\let\@bckp@nextcmd@ii\@bckp@nextcmd@iii
+  \global\let\@bckp@nextcmd@iii\@bckp@nextcmd@iv
+  \global\let\@bckp@nextcmd@iv\@bckp@nextcmd@v
+  \global\let\@bckp@nextcmd@v\@bckp@nextcmd@vi
+  \global\let\@bckp@nextcmd@vi\@bckp@nextcmd@vii
+  \global\let\@bckp@nextcmd@vii\@bckp@nextcmd@viii
+  \global\let\@bckp@nextcmd@viii\@bckp@nextcmd@ix
+  \global\let\@bckp@nextcmd@ix\@bckp@nextcmd@x
+  \global\let\@nextcmd\@bckp@nextcmd@i
+  % Pop \@tkey from stack
+  \global\let\@bckp@tkey@i\@bckp@tkey@ii
+  \global\let\@bckp@tkey@ii\@bckp@tkey@iii
+  \global\let\@bckp@tkey@iii\@bckp@tkey@iv
+  \global\let\@bckp@tkey@iv\@bckp@tkey@v
+  \global\let\@bckp@tkey@v\@bckp@tkey@vi
+  \global\let\@bckp@tkey@vi\@bckp@tkey@vii
+  \global\let\@bckp@tkey@vii\@bckp@tkey@viii
+  \global\let\@bckp@tkey@viii\@bckp@tkey@ix
+  \global\let\@bckp@tkey@ix\@bckp@tkey@x
+  \global\let\@tkey\@bckp@tkey@i
+  % Magic return
+  \let\@currentretfunc\@makeit@astar@
+  \let\@currentretkfunc\@kmakeit@astar@}
+
+% Switch key type based on markers
+\NewDocumentCommand\@@setmarker{st-t+t!t't"t=}{%
+  \@setmarker{#1}{#2}{#3}{#4}{#5}{#6}{#7}%
+  \@nextcmd}
+
+% The actual key command without markers arguments (with the marker set)
+\NewDocumentCommand\@KeyCmd{m}{\@tkey{#1}\@restoremarker}
+
+% The generic command for crypto keys
+\newcommand\AKey{%
+  \global\let\@nextcmd\@KeyCmd
+  \@@setmarker}
+
+
+%
+% A name (in square brackets): \AName (used, for example, in the
+% context of signed by whom)
+%
+% A function name: \AFunctionname
+%
+\newcommand{\AName}[1]{\APri{[#1\/]}}
+\newcommand{\AFunctionname}[1]{\AFunction{\textit{#1}}}
+\NewDocumentCommand{\AProcedurename}{D(){white}m}{\AProcedure{\textit{\@Uline(#1){#2}}}}
+
+
+%
+% Boolean values true and false: \ATrue, \AFalse
+%
+\newcommand{\@True}{\textit{true}}
+\newcommand{\ATrue}{\AVal{\@True}}
+\newcommand{\@False}{\textit{false}}
+\newcommand{\AFalse}{\AVal{\@False}}
+
+
+%
+% Operators
+%
+\newcommand{\@Xor}{\;\oplus\;}
+\newcommand{\AXor}{\ABO{\@Xor}}
+\newcommand{\AConcat}{\ABO{\@Concat}}
+
+
+%
+% Assign name to value
+%
+\newcommand\AAssign[2]{\ensuremath{\AVal{#1}\ABO{\,\leftarrow\,}\AVal{#2}}}
+
+
+%
+% «if, then» and «if, and only if, then»: \AIfthen, \AIffthen
+%
+\newcommand{\AIfthen}{\ensuremath{\Rightarrow}}
+\newcommand{\AIffthen}{\ensuremath{\Leftrightarrow}}
+
+
+%
+% Produces (typically, functions): \AProduces, \ARet
+%
+\newcommand{\AProduces}{\ensuremath{\rightarrow}}
+\newcommand{\AReturns}[1]{\ensuremath{{}\AProduces\AVal{#1}}}
+\newcommand{\ARet}{\AReturns{\empty}}
+
+
+%
+% Sends (typically, messages): \ASends
+%
+\newcommand{\ASends}{\ensuremath{\longrightarrow}}
+\newcommand{\ACsends}{\ensuremath{\rightarrow}}
+\let\@Sends\ASends
+\let\@Sopspc\empty
+
+
+%
+% Conditionals
+%
+\NewDocumentCommand{\ACondstep}{smm}{%
+  \IfBooleanT{#1}{\newline}\ensuremath{#2:\,#3}}
+\newcommand\ANext{\ensuremath{,}}
+\newcommand\ANextbreak{\ABO{\:\:\textbf{;;}\:\:\,}}
+\newcommand\ANextcont{\ABO{\:\:\textbf{;}\:\:\,}}
+\NewDocumentCommand{\ACond}{om}{\ensuremath{%
+  \IfNoValueTF{#1}{\ABO{\textbf{?}\:\:\,}}{#1\ABO{\:\:\textbf{?}\:\:\,}}#2}}
+
+
+%
+% Structured values
+%
+
+% A structured value (or message): \ASval, \AMsg
+\NewDocumentCommand\ASval{O{}m}{%
+  % #1		-> Size of brackets (optional)
+  % #2		-> The content of the message
+  \AVal{\@getbracket{#1}{\{}#2\@getbracket{#1}{\}}}}
+\let\AMsg\ASval
+
+% The typed structured value
+\NewDocumentCommand\ATval{sO{}mE{_}{}m}{%
+  \AVal{\textit{#3\/}%
+    \IfValueT{#4}{_{\textit{#4}}}%
+    \IfBooleanTF{#1}{#5}{\@getbracket{#2}{\{}#5\@getbracket{#2}{\}}}}}
+
+% Help function for \AMktval
+\NewDocumentCommand\@Tval{sO{}E{_}{}m}{%
+  \IfBooleanTF{#1}{%
+    \ATval*[#2]{\@currenttypename}_{#3}{#4}}{%
+    \ATval[#2]{\@currenttypename}_{#3}{#4}}}
+
+% Help function for encrypted values (expected that \@setmarker is called)
+\NewDocumentCommand\@Encrypted{O{}E{_}{}mm}{%
+  \ensuremath{\ATval[#1]{}_{#2}{#4}_{\@tkey{#3}}}\@restoremarker}
+
+% Help function for encrypted values (expected that \@setmarker is called)
+\NewDocumentCommand\@Signed{O{}E{_}{}mm}{%
+  \ensuremath{\ATval[#1]{}_{#2}{#4}^{\@tkey{#3}}}\@restoremarker}
+
+% Create a new type of typed structured value
+\NewDocumentCommand\AMktval{om}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{\gdef\@currenttypename{#2}\@Tval}}{%
+    \@namedef{ATval#2}{\gdef\@currenttypename{#2}\@Tval}}}
+
+% Help functions for \AMketval
+\NewDocumentCommand\@Etval{O{}E{_}{}mm}{%
+  \ATval*{\@currenttypename}_{#2}{\@Encrypted[#1]{#3}{#4}}}
+
+% Create a new type of encrypted typed structured value
+\NewDocumentCommand\AMketval{om}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{%
+      \global\let\@nextcmd\@Etval
+      \gdef\@currenttypename{#2}\@@setmarker}}{%
+    \@namedef{AEtval#2}{%
+      \global\let\@nextcmd\@Etval      
+      \gdef\@currenttypename{#2}\@@setmarker}}}
+
+% Help functions for \AMkstval
+\NewDocumentCommand\@Stval{O{}E{_}{}mm}{%
+  \ATval*{\@currenttypename}_{#2}{\@Signed[#1]{#3}{#4}}}
+
+% Create a new type of signed typed structured value
+\NewDocumentCommand\AMkstval{om}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{%
+      \global\let\@nextcmd\@Stval
+      \gdef\@currenttypename{#2}\@@setmarker}}{%
+    \@namedef{AStval#2}{%
+      \global\let\@nextcmd\@Stval
+      \gdef\@currenttypename{#2}\@@setmarker}}}
+
+
+%
+% Functions
+%
+
+% Help commands for handling magic returns
+\def\@astar@{*}
+\NewDocumentCommand\@makeit@astar@{m}{*}
+\NewDocumentCommand\@kmakeit@astar@{st-t+t!t't"t=mm}{*}
+
+% A function: \AFunc
+%\gdef\@@extra@farg\empty
+\NewDocumentCommand\AFunc{O{}mE{_}{}O{}mo}{%
+  % #1		-> Size (of brackets)
+  % #2		-> Function name
+  % #3		-> Embellishments (more details)
+  % #4		-> More arguments
+  % #5		-> Function arguments
+  % #6		-> Function return values (optional)
+  \def\@return@val{#6}%
+  \AFunction{%
+    \textit{#2\/}%
+    \IfValueT{#3}{_{\AVal{\textit{#3}}}}%
+    \@getbracket{#1}{(}\@fargs{#5}#4\@getbracket{#1}{)}%
+    \IfValueT{#6}{\ifx\@return@val\@astar@ \AReturns{\@currentretfunc[#1]{#5}}\else \AReturns{#6}\fi}}}
+
+% Help function for \AMkfunc
+\NewDocumentCommand\@Func{O{}}{%
+  % #1		-> Size (of brackets)
+  % #2		-> Embellishments (more details)
+  % #3		-> More arguments
+  % #4		-> Function arguments
+  % #5		-> Function return values (optional)
+  \AFunc[#1]{\@currentfuncname}}
+
+% Create a new type of function
+\NewDocumentCommand\AMkfunc{omo}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{%
+      \gdef\@currentfuncname{#2}%
+      \IfValueTF{#3}{%
+        \expandafter\let\expandafter\@currentretfunc\csname #3\endcsname}{%
+        \let\@currentretfunc\@makeit@astar@}%
+      \@Func}}{%
+    \@namedef{AFunc#2}{%
+      \gdef\@currentfuncname{#2}%
+      \IfValueTF{#3}{%
+        \expandafter\let\expandafter\@currentretfunc\csname #3\endcsname}{%
+        \let\@currentretfunc\@makeit@astar@}%
+      \@Func}}}
+
+% Help functions for \AMkkfunc (make key function, 
+% a function where the first argument is a key)
+\NewDocumentCommand\@Kfunc{O{}E{_}{}mmo}{%
+  \def\@kreturn@val{#5}%
+  \AFunc[#1]{\@currentfuncname}_{#2}{\@tkey{#3},#4}%
+  \IfValueT{#5}{\ifx\@kreturn@val\@astar@
+    \AFunction{\AReturns{\@currentretkfunc=[#1]{#3}{#4}}}\else
+    \AFunction{\AReturns{#5}}\fi}\@restoremarker}
+
+% Create a new type of function where first argument is a key
+\NewDocumentCommand\AMkkfunc{omo}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{%
+      \global\let\@nextcmd\@Kfunc
+      \gdef\@currentfuncname{#2}%
+      \IfValueTF{#3}{%
+        \expandafter\let\expandafter\@currentretkfunc\csname #3\endcsname}{%
+        \let\@currentretkfunc\@kmakeit@astar@}%
+      \@@setmarker}}{%
+    \@namedef{AKfunc#2}{%
+      \global\let\@nextcmd\@Kfunc
+      \gdef\@currentfuncname{#2}%
+      \IfValueTF{#3}{%
+        \expandafter\let\expandafter\@currentretkfunc\csname #3\endcsname}{%
+        \let\@currentretkfunc\@kmakeit@astar@}%
+      \@@setmarker}}}
+
+% A procedure: \AProc
+\NewDocumentCommand\AProc{D(){white}mE{_}{}o}{%
+  % #1		-> Optional background color (contour)
+  % #2		-> Procedure name
+  % #3		-> Embellishments (more details)
+  % #4		-> Procedure optional comment
+  \AProcedure{%
+    \textit{\@Uline(#1){#2\/}}%
+    \IfValueT{#3}{_{\AVal{\textit{#3}}}}%
+    (\IfValueT{#4}{\AStr{#4}})}}
+  
+% Help function for \AMkproc
+\NewDocumentCommand\@Proc{D(){white}E{_}{}o}{%
+  % #1		-> Optional background color (contour)
+  % #2		-> Embellishments (more details)
+  % #3		-> Function arguments
+  \AProc(#1){\@currentprocname}_{#2}[#3]}
+
+% Create a new type of procedure
+\NewDocumentCommand\AMkproc{om}{%
+  \IfValueTF{#1}{%
+    \@namedef{#1}{%
+      \gdef\@currentprocname{#2}\@Proc}}{%
+    \@namedef{AProc#2}{%
+      \gdef\@currentprocname{#2}\@Proc}}}
+
+
+%
+% Send a message from a sender to a receiver: \send
+%
+
+% Wrap data sent in a message
+\NewDocumentCommand\@Sendmsg{O{}m}{\AMsg[#1]{#2}}
+
+% Do not wrap data sent in a message
+\NewDocumentCommand\@Ssendmsg{O{}m}{#2}
+
+% Send a message #5 from #3 to #4
+\NewDocumentCommand\ASend{sO{}mmm}{%
+  % #1		-> Do not wrap in message (if * given)
+  % #2		-> Size of brackets (optional)
+  % #3		-> Send message from (the sender)
+  % #4		-> Send message to (the receiver)
+  % #5		-> The content of the message
+  \ensuremath{\APri{#3}\@Sopspc\@Sends\@Sopspc\APri{#4}\@Sopspc:\@Sopspc
+    \IfBooleanTF{#1}{\@Ssendmsg{#5}}{\@Sendmsg[#2]{#5}}}}
+
+% A more compact version of send (needs less space)
+\NewDocumentCommand\ACsend{sO{}mmm}{%
+  \let\@Sends\ACsends
+  \let\@Sopspc\!
+  \IfBooleanTF{#1}{\ASend*[#2]{#3}{#4}{#5}}{\ASend[#2]{#3}{#4}{#5}}%
+  \let\@Sends\ASends
+  \let\@Sopspc\empty}
+
+% Save the original \ASend so it can be restored when it is changed (in the `ASteps` environment)
+\let\@Send\ASend
+
+
+%
+% A group: \AGroup
+%
+\let\@Groupnamecmd\APri
+\NewDocumentCommand\AGroup{sO{1}O{n}m}{%
+  % #1		-> If set, use ... to span group, otherwise use -- (*)
+  % #2		-> Start index of group members (optional, default 1)
+  % #3		-> End index of group members (optional, default n)
+  % #4		-> Name of group
+  \IfBooleanTF{#1}%
+  {\ensuremath{\@Groupnamecmd{#4_{#2}},\ldots,\@Groupnamecmd{#4_{#3}}}}%
+  {\ensuremath{\@Groupnamecmd{#4_{#2}}\text{--}\@Groupnamecmd{#4_{#3}}}}}
+
+
+%
+% Commands for encryption/decryption: \AEncrypted, \encrypt, \decrypt
+%
+
+% The text used for the encrypt and decrypt functions
+\newcommand{\AEncrypttext}{Encrypt}
+\newcommand{\ADecrypttext}{Decrypt}
+\newcommand{\APwkeytext}{PwKey}
+\newcommand{\ADhpubkeytext}{DHPubKey}
+\newcommand{\ADhkeystext}{DHKey}
+
+% An encrypted message
+\AMketval[AEncrypted]{}
+
+% The encrypt function (return magic: producing encrypted values)
+\AMkkfunc[AEncrypt]{\AEncrypttext}[AEncrypted]
+
+% The decrypt function
+\AMkkfunc[ADecrypt]{\ADecrypttext}
+
+% Generate key from password
+\AMkfunc[@Pwkeyf]{\APwkeytext}
+\newcommand\@Salt[1]{\AFunction{,\:}\AVal{#1}}
+\NewDocumentCommand\APwkeyf{O{}E{_}{}md()o}{%
+  \def\@pwreturn@val{#5}%
+  \IfValueTF{#4}{\def\@@extra@farg{\@Salt{#4}}}{\def\@@extra@farg{}}%
+  \@Pwkeyf[#1]_{#2}[\@@extra@farg]{\AVal{#3}}%
+  \IfValueT{#5}{\AFunction{%
+      \ifx\@pwreturn@val\@astar@ \AReturns{\APwkey{#3}}\else \AReturns{#5}\fi}}}
+
+% Make public key from secret key and public parameters (Diffie-Hellman)
+\AMkfunc[@Dhpubkeyf]{\ADhpubkeytext}
+\NewDocumentCommand\ADhpubkeyf{sO{}E{_}{}md()o}{%
+  \IfBooleanTF{#1}{%
+    \let\@@Prkey\empty
+    \let\@@Pubkey\empty}{%
+    \let\@@Prkey\APrivkey
+    \let\@@Pubkey\APubkey}%
+  \IfValueTF{#5}{\let\@@Salt\@Salt}{\let\@@Salt\AEatit}%
+  \IfValueTF{#6}{%
+    \@Dhpubkeyf[#2]_{#3}{\@@Prkey{#4}\@@Salt{#5}}[\@@Pubkey{#6}]}{%
+    \@Dhpubkeyf[#2]_{#3}{\@@Prkey{#4}\@@Salt{#5}}}}
+
+% Combine secret key with public key and public parameters to generate
+% a new secret (shared) key (Diffie-Hellman)
+\AMkfunc[@Dhkeyf]{\ADhkeystext}
+\NewDocumentCommand\ADhkeyf{sO{}E{_}{}mmd()o}{%
+  \IfBooleanTF{#1}{%
+    \let\@@Prkey\empty
+    \let\@@Pubkey\empty
+    \let\@@Skey\empty}{%
+    \let\@@Prkey\APrivkey
+    \let\@@Pubkey\APubkey
+    \let\@@Skey\AKey}%
+  \IfValueTF{#6}{\let\@@Salt\@Salt}{\let\@@Salt\AEatit}%
+  \IfValueTF{#7}{%
+    \@Dhkeyf[#2]_{#3}{\@@Prkey{#4},\@@Pubkey{#5}\@@Salt{#6}}[\@@Skey{#7}]}{%
+    \@Dhkeyf[#2]_{#3}{\@@Prkey{#4},\@@Pubkey{#5}\@@Salt{#6}}}}
+
+
+%
+% Cryptographic hash value: \AChash
+%
+
+% The text used for the hash value and function
+\newcommand{\AHashtext}{H}
+\newcommand{\AHashfunctext}{H}
+
+% A cryptographic hash value 
+\AMktval[AChash]{\AHashtext}
+  
+% A cryptographic hash function (return magic: producing chash values)
+\AMkfunc[AChashf]{\AHashfunctext}[AChash]
+
+
+%
+% Message authentication code: \AMac, \ACmac, \AHmac
+%
+
+% The text used for the hash value and function
+\newcommand{\AMactext}{MAC}
+\newcommand{\AMacfunctext}{\AMactext}
+\newcommand{\ACmactext}{CMAC}
+\newcommand{\ACmacfunctext}{\ACmactext}
+\newcommand{\AHmactext}{HMAC}
+\newcommand{\AHmacfunctext}{\AHmactext}
+
+% Message authentication code 
+\AMkstval[AMac]{\AMactext}
+
+% Message authentication code function
+\AMkkfunc[AMacf]{\AMacfunctext}[AMac]
+
+% Message authentication code 
+\AMkstval[ACmac]{\ACmactext}
+
+% Message authentication code function
+\AMkkfunc[ACmacf]{\ACmacfunctext}[ACmac]
+
+% Message authentication code 
+\AMkstval[AHmac]{\AHmactext}
+
+% Message authentication code function
+\AMkkfunc[AHmacf]{\AHmacfunctext}[AHmac]
+
+
+% 
+% Signatures, signing, and signed messages: \ASig, \ASign, \ASigned
+%
+
+% The text used for the signature type and sign function
+\newcommand{\ASigtext}{Sig}
+\newcommand{\ASigfunctext}{Sig}
+\newcommand{\ASigntext}{Sign}
+
+% A signature value
+\AMkstval[ASig]{\ASigtext}
+
+% A signature function
+\AMkkfunc[ASigf]{\ASigfunctext}[ASig]
+
+% A signed message
+\AMkstval[ASigned]{}
+
+% The sign function
+\AMkkfunc[ASign]{\ASigntext}[ASigned]
+
+
+%
+% Verify: \AVerify
+%
+
+% The text used for the verify function
+\newcommand{\AVerifytext}{Verify}
+
+% The verify function
+\AMkkfunc[AVerify]{\AVerifytext}
+
+
+%
+% Certificate: \ACertificate
+%
+
+% The text used for the certificate type
+\newcommand{\ACerttext}{Cert}
+
+% A certificate value
+\AMkstval[ACertificate]{\ACerttext}
+
+% A certificate value
+\NewDocumentCommand\@Cert{O{}E{_}{}mm}{%
+  \ATval*{\ACerttext}_{#2}{\@Signed[#1]{#3}{\APri{#4},\APubkey{#4}}}%
+  \@restoremarker}
+\newcommand\ACert{%
+  \global\let\@nextcmd\@Cert
+  \@@setmarker}
+
+
+%
+% Procedures
+%
+
+% The text used for the Abort procedure
+\newcommand{\AAborttext}{Abort}
+
+% The abort procedure: \AAbort
+\AMkproc[AAbort]{Abort}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The `ASteps` environment is a list with different types of numbered items
+% (default S with \astep and M with \ASend)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%
+% Counters are used to number each types of steps (and be able to refer to them)
+%
+
+% Check if a counter is defined: \@Ifcounter{counter}{do if defined}{do if not defined)
+\newcommand*\@Ifcounter[1]{%
+  \ifcsname c@#1\endcsname
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi
+}
+
+% We are counting each series of steps (each `ASteps` environment)
+\newcounter{AStepscounter}
+
+% Reset the listed counters in series of steps (and create counter if
+% it does not exits)
+\NewDocumentCommand\reset@or@create@counter{sm}{%
+  \@Ifcounter{counter#2}{% Does this counter exist?
+    \IfBooleanTF{#1}{}{\setcounter{counter#2}{0}}% Do not reset counters for ASteps*
+  }{%
+    \newcounter{counter#2}[AStepscounter]% If counter do not exist, create it
+  }%
+  \@namedef{acounter#2}{\stepcounter{counter#2}\arabic{counter#2}}% Command to step+present counter
+  \@namedef{thecounter#2}{\ensuremath{#2_{\arabic{counter#2}}}}% % Command to type the label with counter
+}
+
+% A named version of the *-version of \reset@or@create@counter
+\def\sreset@or@create@counter#1{\reset@or@create@counter*{#1}}
+
+
+%
+% Lengths
+%
+
+% Left and right margins of ASteps environment
+\newlength{\AStepsleftmargin}
+\newlength{\@Stepslmarg}
+\setlength{\AStepsleftmargin}{\tabcolsep}
+\newlength{\AStepsrightmargin}
+\newlength{\@Stepsrmarg}
+\setlength{\AStepsrightmargin}{\tabcolsep}
+
+% Space between label and step (1em -> \quad, 2em -> \qquad)
+\newlength{\AStepslabelspace}
+\newlength{\@Stepslabelspace}
+\setlength{\AStepslabelspace}{1.5em}
+
+% The label command in ASteps (use this so it can be turned off)
+\global\let\ASteplabel\label
+
+
+%
+% Each step
+%
+
+% A step or item (can be different types) in the message list
+% (\ASend can be used a special kind of step of type M)
+
+\NewDocumentCommand\@Mstep{sD(){S}mo}{%
+  \ALabel{#2_{\csname acounter#2\endcsname}}%
+  \IfNoValueTF{#4}{}{%
+    \addtocounter{counter#2}{-1}\refstepcounter{counter#2}\ASteplabel{#4}}%
+  \IfBooleanTF{#1}{%
+    & \multicolumn{4}{@{}l@{}}{} & #3}{%
+    & \multicolumn{5}{@{}l@{\hskip\@Stepsrmarg\relax}}{#3}}}
+
+\NewDocumentCommand\@Nstep{sm}{%
+  \IfBooleanTF{#1}{%
+    & \multicolumn{4}{@{}l@{}}{} & #2}{%
+    & \multicolumn{5}{@{}l@{\hskip\@Stepsrmarg\relax}}{#2}}}
+
+\NewDocumentCommand\@Mstepat{sD(){S}mmo}{%
+  \ALabel{#2_{\csname acounter#2\endcsname}}%
+  \IfNoValueTF{#5}{}{%
+    \addtocounter{counter#2}{-1}\refstepcounter{counter#2}\ASteplabel{#5}}%
+  \IfBooleanTF{#1}{%
+    & \multicolumn{2}{@{}l@{}}{} & \APri{#3} & : & #4}{%
+    & \multicolumn{5}{@{}l@{\hskip\@Stepsrmarg\relax}}{\APri{#3}\;:\;#4}}}
+
+\NewDocumentCommand\@Nstepat{smm}{%
+  \IfBooleanTF{#1}{%
+    & \multicolumn{2}{@{}l@{}}{} & \APri{#2} & : & #3}{%
+    & \multicolumn{5}{@{}l@{\hskip\@Stepsrmarg\relax}}{\APri{#2}\;:\;#3}}}
+
+\NewDocumentCommand\@Mrawstep{D(){S}O{}O{}O{}O{}mo}{%
+  \ALabel{#1_{\csname acounter#1\endcsname}}%
+  \IfNoValueTF{#7}{}{%
+    \addtocounter{counter#1}{-1}\refstepcounter{counter#1}\ASteplabel{#7}}%
+  & #2 & #3 & #4 & #5 & #6}
+\NewDocumentCommand\@Nrawstep{O{}O{}O{}O{}m}{%
+  & #1 & #2 & #3 & #4 & #5}
+
+% An implementation of \ASend used in the `ASteps` environment
+\NewDocumentCommand\@Msend{sD(){M}O{}mmmo}{%
+  % #1		-> Do not wrap in message (if * given)
+  % #2		-> Size of brackets (optional)
+  % #3		-> Send message from (the sender)
+  % #4		-> Send message to (the receiver)
+  % #5		-> The content of the message
+  % #6		-> A label (can be used to refer to a step in a `ASteps` environment)
+  \IfBooleanTF{#1}{\global\let\@Msendmsg\@Ssendmsg}{\global\let\@Msendmsg\@Sendmsg}%
+  \IfNoValueTF{#7}{%
+    \@Mrawstep(#2)[\APri{#4}][\ASends][\APri{#5}][:]{\@Msendmsg[#3]{#6}}}{%
+    \@Mrawstep(#2)[\APri{#4}][\ASends][\APri{#5}][:]{\@Msendmsg[#3]{#6}}[#7]}}
+
+% An implementation of \ASend used in the `ASteps*` environment
+\NewDocumentCommand\@Nsend{sO{}mmm}{%
+  % #1		-> Do not wrap in message (if * given)
+  % #2		-> Size of brackets (optional)
+  % #3		-> Send message from (the sender)
+  % #4		-> Send message to (the receiver)
+  % #5		-> The content of the message
+  \IfBooleanTF{#1}{\global\let\@Nsendmsg\@Ssendmsg}{\global\let\@Nsendmsg\@Sendmsg}%
+  \@Nrawstep[\APri{#3}][\ASends][\APri{#4}][:]{\@Nsendmsg[#2]{#5}}}
+
+% Possible keyvals for the ASteps environment
+\def\@Stepslabels{}
+\define@key{ASteps}{labels}{\def\@Stepslabels{#1}}
+\define@key{ASteps}{lmarg}[\AStepsleftmargin]{\setlength{\@Stepslmarg}{#1}}
+\define@key{ASteps}{rmarg}[\AStepsrightmargin]{\setlength{\@Stepsrmarg}{#1}}
+\define@key{ASteps}{lspace}[\AStepslabelspace]{\setlength{\@Stepslabelspace}{#1}}
+
+% A series (list) of messages or other steps: \begin{ASteps} ... \end{ASteps}
+\NewDocumentEnvironment{ASteps}{sO{}+b}{% The `ASteps` environment
+  \setlength{\@Stepslmarg}{\AStepsleftmargin}%
+  \setlength{\@Stepsrmarg}{\AStepsrightmargin}%
+  \setlength{\@Stepslabelspace}{\AStepslabelspace}%
+  \setkeys{ASteps}{#2}%
+  \IfBooleanTF{#1}{% *-version of the environment
+    \sreset@or@create@counter{M}% A message step with an M-label (using \ASend)
+    \sreset@or@create@counter{S}% A normal step with an S-label (using \astep)
+    \expandafter\forcsvlist\expandafter{\expandafter\sreset@or@create@counter\expandafter}\expandafter{\@Stepslabels}%
+    % See https://tex.stackexchange.com/questions/173383/splitting-a-csv-list-from-a-xkeyval-key-argument-into-parts
+  }{%
+    \stepcounter{AStepscounter}% Normal version of the environment
+    \reset@or@create@counter{M}% A message step with an M-label (using \ASend)
+    \reset@or@create@counter{S}% A normal step with an S-label (using \astep)
+    \expandafter\forcsvlist\expandafter{\expandafter\reset@or@create@counter\expandafter}\expandafter{\@Stepslabels}%
+    % See https://tex.stackexchange.com/questions/173383/splitting-a-csv-list-from-a-xkeyval-key-argument-into-parts
+  }%
+  \let\ARawstep\@Mrawstep%
+  \let\AStep\@Mstep%
+  \let\AStepat\@Mstepat%
+  \let\ASend\@Msend%
+  \renewcommand{\arraystretch}{1.3}%
+  \begin{tabular}{@{\hskip\@Stepslmarg\relax}c@{\hskip\@Stepslabelspace\relax}c@{\;}c@{\;}c@{\;}c@{\;}l@{%
+    \hskip\@Stepsrmarg\relax}}
+    #3
+  \end{tabular}%
+  \let\ASend\@Send
+  \def\@Stepslabels{}\ignorespacesafterend}
+
+% without label
+\NewDocumentEnvironment{ASteps*}{O{}+b}{%
+  \setlength{\@Stepslmarg}{\AStepsleftmargin}%
+  \setlength{\@Stepsrmarg}{\AStepsrightmargin}%
+  \setkeys{ASteps}{#1}%
+  \let\ARawstep\@Nrawstep%
+  \let\AStep\@Nstep%
+  \let\AStepat\@Nstepat%
+  \let\ASend\@Nsend%
+  \renewcommand{\arraystretch}{1.3}%
+  \begin{tabular}{@{\hskip\@Stepslmarg\relax}p{0pt}@{}c@{\;}c@{\;}c@{\;}c@{\;}l@{%
+    \hskip\@Stepsrmarg\relax}}
+    #2
+  \end{tabular}\let\ASend\@Send\ignorespacesafterend}
+
