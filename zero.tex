@@ -1,0 +1,196 @@
+% -*-mode: LaTeX; coding: utf-8; -*-
+\documentclass{article}
+\usepackage[a4paper, margin=2cm]{geometry}
+% For vakker crypto.  Dokumentasjonen ligger i katalogen
+\usepackage{aspen}
+% For vakrere referanser
+\usepackage{cite}
+
+
+\title{Zero-knowledge proof}
+\author{[TaSK]}
+\date{juni 2026}
+\begin{document}
+\maketitle
+
+   
+\section{Innledning}
+Dette tekniske notatet gir en oversikt over en publisert
+artikkel~\cite{Goldwasser1985Knowledge,Goldwasser1989Knowledge}.
+Fordi dette notatet beskriver en artikkel er her ingen nye resultater.
+Termer som ``artikkelen'', ``kapittel 2'', ``figur 2'', og tilsvarende
+refererer til~\cite{Goldwasser1989Knowledge}.  Der det er nødvendig å
+referere til denne teksten bruker vi eksplisitt ``i dette notatet''.
+
+Det gjøres ingen antagelser om kanaler som meldinger sendes på, utover
+ordning i tid (en melding ankommer ikke føær den er sendt).  I
+særdeleshet antas det ikke at kanaler tilbyr konfidensialitet. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Bakgrunn}
+Tema er hvordan  Alice kan overbevise Bob at hun kjenner en
+hemmelighet, uten å hverken fortelle noe av verdi til Bob (ut over at
+hun kjenner hemmeligheten), og heller ikke til Charlie (som ikke
+kjenner hemmeligheten) som lytter på samtalen.
+
+For eksempel: Gitt at Alice har konfidensielle data, for eksempel
+et dokument; la oss kalle dokumentet for $D$.  Hun tilbyr ett eller
+annet til andre som også har dokumentet.  Bob mener han har det, og
+ønkser å bevise til Alice om det.  Når følgende protokoll er ferdig er
+\APri{A} overbevist om at \APri{B} også har (tilgang til) $D$:
+
+\begin{ASteps*}
+  \ASend*{A}{B}{\ANonce{A}} \\
+  \ASend*{B}{A}{\AChash{\ANonce{A} \AConcat D}}
+\end{ASteps*}
+%
+hvor notasjonen $\AConcat$ betyr sammensetting
+(\textit{concatination}), $\ANonce{A}$ ``et svært stort tilfeldig
+tall'' (la oss si $\approx2^{256}$), og $\AChash{m}$ et digitalit
+fingeravtrykk (\textit{hashing}) av $m$.
+
+Fordi han lytter på all kommunikasjon kjenner Charlie nå $\ANonce{A}$
+og $\AChash{\ANonce{A} \AConcat D}$.  Det vil si at om han har stjålet et
+dokument $D^\prime$ kan han undersøke om $D^\prime = D$ ved å beregne
+$\AChash{\ANonce{A} \AConcat D^\prime}$ og sammenligne med
+$\AChash{\ANonce{A} \AConcat D}$.  Det vil at protokollen mellom
+$\APri{A}$ og $\APri{B}$ lakk (meta)informasjon om $D$ til
+$\APri{C}$.
+
+Evnen til å kunne verifisere om $D=D^\prime$ er en betydelig forde som
+kan gi næring til mange typer angrep.  \textit{Zero Knowledge} handler
+om å overbevise den andre uten å lekke informasjon. 
+
+
+\section{Matematisk utgangspunkt}
+Den matematiske konteksten i artikkelen er språk og
+kompleksitetsklasser; vi gir derfor en kort oppfriskning.
+
+\subsection{Språk}
+Alan Turing var den første til å representere (matematiske) spørsmål
+med symboler (tekst)~\cite{Turing1937Computable} men det var først 25 år
+senere at det ble forstått at dersom et problem representeres som en
+kompakt streng (sekvens av symboler) så vil lengden av strengen være
+et mål på ``størrelsen'' av problemet~\cite{Hartmanis1965Complexity}.
+For en introduksjon til anbefaler vi~\cite{AroraBarak2009Complexity};
+første kapittel går nøye gjennom representasjon av problemer.
+
+I spørsmål om involverer tall er det åpenbart hvordan problemet skal
+representeres. For eksempel: Om spørsmålet er: ``Er tallet et
+primtall?'' så er problemet som skal besvares et tall.
+Tallet (problemet) kan være $X=323$ (som vil si $(101000011)_2$).
+Lengden på dette problemet er $9$.
+
+Når spørsmålet omhandler en graf, for eksempel om grafen er forbundet,
+kan kan vi konvertere grafen til en matrise (hvor $M_{ij}=0$ om det
+ikke er en kant mellom nodene $i$ og $j$).  Når en slik matrise
+skrives ut blir resultatet igjen en streng (av $0$ og $1$).
+
+Når vi bruker strenger til å representere problemer på denne måten kan
+vi betrakte strengene som et ``ord''; hver streng representerer ett
+(og bare ett) problem.  Indirekte har vi nå også fått et mål på
+størrelse: Jo lenger streng jo større problem.
+
+Om vi ser på de to uendelige settene av alle probløemer (tall eller
+fgrafer) så vil spørsmålet (``Er tallet prim?'', eller ``Er grafen
+forbundet?'') dele  settet i to: Ja eller nei; de begge tilfellene vil
+to sub-settene ikke være like store.  Settet som representerer ``ja'',
+det er ord i \emph{et språk}.
+
+Spørsmålet om $X$ er prim, det heter \textsc{Primes}.  Den uformelle
+beskrivelksen blir at gitt en binær streng som vi tolker som et
+tall $X$ slik at $X\in\textbf{N}$, er $X$ et primtall?  Her behøver vi
+heldigvis ikke definere hva primtall er, for det vet vi.  Språket
+\textsc{Primes} er settet med (binære) strenger som representerer tall
+som er prim.
+Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
+tilhører ikke alle tall språket \textsc{Primes}.
+
+Spørsmålet om en graf inneholder en komplett sub-graf (klikk) det
+heter \textsc{Clique}.  Språket $L_\textsc{Clique}$ er ``ord'' hvor
+svaret er ``ja'':
+\begin{equation}
+  L_{\textsc{CLIQUE}} = \{ \langle G, k \rangle \mid G \text{ har en
+    klikk med størrelse } k \}
+\end{equation}
+Her er $G$ en streng som representerer en graf og $k$ et tall
+(størrelsen på klikken).
+
+
+
+\subsection{Kompleksitesklasser}
+
+\subsubsection{Klassen P}
+De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
+polynomisk relativ til lengden på spørsmålet, de sies å tilhøre
+klassen \textbf{P}.
+
+For eksempel \textsc{Partall}:
+\begin{equation}
+  \textsl{PARTALL}: \{n: n \textrm{er partall}
+\end{equation}
+Algoritmen for å bestemme om et tall er i \textsc{Partall} er å se om
+siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen) og
+derfor klart mindre enn polynomisk tid.
+
+Gitt en graf $G$ kan vi bruke bredde-først eller dybde-først for å
+finne om én node er forbundet med en annen.  Ingen av dem vokser mer
+enn polynomisk når størrelsen på $G$ er målet.  Det vil si at språkket
+\textsc{Sti} er i \textbf{P}:
+\begin{equation}
+  \textrm{STI} = \{(G, a, b): \textrm{Det er en sti fra $a$ til $b$ i
+    $G$} 
+\end{equation}
+
+%
+%
+\subsubsection{Klassen NP}
+
+En annen klasse, som inkluderer settet \textbf{P}, er \textbf{NP}.
+Språk i denne klassen er de hvor det er mulig å verifisere et
+bevis\footnote{På engelsk har \emph{proof} og \emph{evidence}
+forskjellig betydning.  Når vi snakker om \emph{bevis} her mener vi
+\emph{evidence}.} på at en instans har ``ja''-svar i polynomisk tid.
+
+For å se at $P$ er innholdt i $NP$ er det tilstrekkelig å notere at
+elementene  i $P$ kan konstrueres i polynomisk tid.  Det vil si det
+ikke er behov for noe bevis i det hele tatt; man kan bare regne ut
+løsningen.
+
+Et språk som ofte brukes som eksempel er \textsc{Sammensatt}:
+\begin{equation}
+  \textrm{SAMMENSATT}: \{n: \textrm{n er sammensatt (ikke prim)}\}
+\end{equation}
+Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
+Kompleksiteten ved å verifisere, altså multiplisere, øker med lengden
+på $x$ og $y$ (som naturligvis øker med lengden på $n$), men kun
+polynomisk.  Altså er \textsc{Sammensatt} i \textbf{NP}.  Kjernen er
+at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
+men undersøke om et bevis er gyldig.
+
+\textsc{Primes} er også i \textbf{NP} fordi det finnes et bevis somk
+kan verifiseres i polynomisk tid.  Dersom $n$ er prim da vil det
+finnes en $a^{n-1} = 1 (= n)$ og for hver primfaktor $q$ av
+$n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et bevis for at $n$ er
+prim vil være $a$ sammen med faktoriseringen av $n-1$ (og tilsvarende
+bevis for at de faktorene er prim).
+
+Her er det viktig å huske at å finne ut om $n$ er prim er ett problem
+mens avgjøre om beviset på at $n$ er prim er gyldig, er et annet.
+Kravet for at et problem er i \textbf{NP} er altså at det finnes et
+bevis (og ikke nødvendigvis at beviset er ``lett'' å finne).
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+\section{Notasjon}
+
+\bibliographystyle{plain}
+\bibliography{zero}
+
+\end{document}
+
+
+
+
+
