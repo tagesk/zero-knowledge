@@ -31,13 +31,16 @@ særdeleshet antas det ikke at kanaler tilbyr konfidensialitet.
 Tema er hvordan  Alice kan overbevise Bob at hun kjenner en
 hemmelighet, uten å hverken fortelle noe av verdi til Bob (ut over at
 hun kjenner hemmeligheten), og heller ikke til Charlie (som ikke
-kjenner hemmeligheten) som lytter på samtalen.
+kjenner hemmeligheten) som lytter på samtalen.  Det er en fordel om
+Charlie heller ikke kan konkludere at Alice kjenner hemmeligheten ut
+fra kommunikasjonen.
 
 For eksempel: Gitt at Alice har konfidensielle data, for eksempel
 et dokument; la oss kalle dokumentet for $D$.  Hun tilbyr ett eller
-annet til andre som også har dokumentet.  Bob mener han har det, og
-ønkser å bevise til Alice om det.  Når følgende protokoll er ferdig er
-\APri{A} overbevist om at \APri{B} også har (tilgang til) $D$:
+annet til andre som også har dokumentet, for eksempel en form for
+login.  Bob mener han har det, og ønkser å bevise det til Alice.  Når
+følgende protokoll er ferdig er \APri{A} overbevist om at \APri{B}
+også har (tilgang til) $D$: 
 
 \begin{ASteps*}
   \ASend*{A}{B}{\ANonce{A}} \\
@@ -45,24 +48,35 @@ annet til andre som også har dokumentet.  Bob mener han har det, og
 \end{ASteps*}
 %
 hvor notasjonen $\AConcat$ betyr sammensetting
-(\textit{concatination}), $\ANonce{A}$ ``et svært stort tilfeldig
-tall'' (la oss si $\approx2^{256}$), og $\AChash{m}$ et digitalit
-fingeravtrykk (\textit{hashing}) av $m$.
+(\textit{concatination}), $\ANonce{A}$ ``et tilstrekkelig stort
+tilfeldig tall'' (la oss si $\approx2^{256}$), og $\AChash{m}$ et
+digitalit fingeravtrykk (\textit{hashing}) av $m$.  Vi noterer i
+margen at denne enkle protokollen har mange svakheter og ikke
+tilfredsstiller moderne krav; den fyller likevel formålet her.
 
 Fordi han lytter på all kommunikasjon kjenner Charlie nå $\ANonce{A}$
 og $\AChash{\ANonce{A} \AConcat D}$.  Det vil si at om han har stjålet et
 dokument $D^\prime$ kan han undersøke om $D^\prime = D$ ved å beregne
 $\AChash{\ANonce{A} \AConcat D^\prime}$ og sammenligne med
 $\AChash{\ANonce{A} \AConcat D}$.  Det vil at protokollen mellom
-$\APri{A}$ og $\APri{B}$ lakk (meta)informasjon om $D$ til
-$\APri{C}$.
+$\APri{A}$ og $\APri{B}$ lakk (meta)informasjon om $D$ til Charlie.
 
-Evnen til å kunne verifisere om $D=D^\prime$ er en betydelig forde som
+Evnen til å kunne verifisere om $D=D^\prime$ er en betydelig fordel som
 kan gi næring til mange typer angrep.  \textit{Zero Knowledge} handler
-om å overbevise den andre uten å lekke informasjon. 
+om å overbevise den andre om noe, uten å lekke informasjon.
+
+Under de rette antagelsene er det mye som er mulig.  I praksis er mye
+vanskelig.  Kompleksitetsteori er verktøyet for å snakke om
+antagelser, og derfor gi et mål på hvor ``vanskelig'' noe
+er. Kapittel~\ref{sec:utgangspunkt} gir nødvendig matematisk bakgrunn.
 
 
+
+
+%
+%
 \section{Matematisk utgangspunkt}
+\label{sec:utgangspunkt}
 Den matematiske konteksten i artikkelen er språk og
 kompleksitetsklasser; vi gir derfor en kort oppfriskning.
 
@@ -78,31 +92,42 @@ første kapittel går nøye gjennom representasjon av problemer.
 I spørsmål om involverer tall er det åpenbart hvordan problemet skal
 representeres. For eksempel: Om spørsmålet er: ``Er tallet et
 primtall?'' så er problemet som skal besvares et tall.
-Tallet (problemet) kan være $X=323$ (som vil si $(101000011)_2$).
-Lengden på dette problemet er $9$.
+Tallet (problemet) kan være $323$ (som vil si $(101000011)_2$).
+Vi har altså et spørsmål og et problem (i konktekst av spørsmålet).
 
 Når spørsmålet omhandler en graf, for eksempel om grafen er forbundet,
 kan kan vi konvertere grafen til en matrise (hvor $M_{ij}=0$ om det
 ikke er en kant mellom nodene $i$ og $j$).  Når en slik matrise
-skrives ut blir resultatet igjen en streng (av $0$ og $1$).
+skrives ut blir resultatet igjen en streng (av $0$ og $1$).  Lengden
+på dette problemet er naturligvis produktet av dimensjonene.
+
+Hvordan spørsmålet rent praktisk skal besvares, dét er en annen sak.
+Oppgaven er ofte å finne en så effektiv metode som mulig.  Det er lett
+å finne ut om $N$ er prim (prøve å dividere med alle tall
+$<\sqrt{N}$) om enn tidkrevende om $N$ er stor.  Det finnes mye mer
+effektive algoritmer; det beste vi kjenner er  $\tilde{O}(\log^6
+n)$\cite{Agrawal2004}.  Det er avgjørende her å se at å avgjøre om et
+tall er prim eller ei er noe annet og mye lettere enn å faktisk finne
+primfaktorene.
 
 Når vi bruker strenger til å representere problemer på denne måten kan
 vi betrakte strengene som et ``ord''; hver streng representerer ett
 (og bare ett) problem.  Indirekte har vi nå også fått et mål på
 størrelse: Jo lenger streng jo større problem.
+Legg merke til at tallet $1234567890$ er (litt mer enn) ti ganger så
+stort som tallet $123456789$.  Men som problem er $1234567890$ bare
+knappe 10\% større (lengere).
 
-Om vi ser på de to uendelige settene av alle probløemer (tall eller
-fgrafer) så vil spørsmålet (``Er tallet prim?'', eller ``Er grafen
-forbundet?'') dele  settet i to: Ja eller nei; de begge tilfellene vil
-to sub-settene ikke være like store.  Settet som representerer ``ja'',
-det er ord i \emph{et språk}.
+Problemene til et gitt spørsmål er et (uendelig) sett av strenger.
+Spørsmålet deler dette settet to: De problemer som har svaret ``ja''
+og de som ikke har svaret ``ja''.
+Kombinasjonen av et spørsmål, en representasjon av problemene som skal
+besvares, settet av alle problemer, og medlemmene av settet som har
+svaret ``ja'', det kaller vi \emph{et språk}.
 
-Spørsmålet om $X$ er prim, det heter \textsc{Primes}.  Den uformelle
-beskrivelksen blir at gitt en binær streng som vi tolker som et
-tall $X$ slik at $X\in\textbf{N}$, er $X$ et primtall?  Her behøver vi
-heldigvis ikke definere hva primtall er, for det vet vi.  Språket
-\textsc{Primes} er settet med (binære) strenger som representerer tall
-som er prim.
+Språket som inkluderer spørsmålet om $X$ er prim når $X \in
+\textbf{N}$ og settet med tall hvor svaret er ``ja'', det heter
+\textsc{Primes}.
 Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
 tilhører ikke alle tall språket \textsc{Primes}.
 
@@ -117,8 +142,43 @@ Her er $G$ en streng som representerer en graf og $k$ et tall
 (størrelsen på klikken).
 
 
-
 \subsection{Kompleksitesklasser}
+
+Det viser seg at språkene faller naturlig ned i et sett med klasser:
+Vi kaller dem kompleksitetsklasser.  Klassene skiller seg fra
+hverandre ved noen sentrale egenskaper ved de språkene som er med i
+klassen.  Det viser seg også at det er ``lett'' å konvertere et språk
+i en klasse til et annet i samme klasse.
+At noe er ``lett'' betyr her
+at det er i klassen \textbf{P} (se nedenfor).
+
+\subsubsection{Vekst}
+
+Når vi skal addere to tall, da legger vi først sammen siste siffer i
+begge tallene, deretter nest siste, og så videre.  Det vil si at
+kompleksiteten vokser lineært med lengden på tallene (dobbelt så lange
+tall krever dobbelt så mange operasjoner).  Vi ser utelukkende på
+tallenes lengde, ikke deres ``størrelse''.
+
+Multiplikasjon krever at vi hvert siffer i tallene med hverandre, og
+summerer resultatene til slutt.  Mest arbeid er det når tallene er
+like lange.  Kompleksiteten i multiplikasjon er derfor $O{N}^2$ hvor
+$N$ her ikke er tallene men lengden på dem.
+
+Som regel kan vi bruke tid på å regne noe ut, eller pre-beregne for å
+tjene tid senere.  Det vil si bytte vekst i tid mot vekst i rom.  Det
+viser seg at problemer i en klasse ikke kan ``bryte ut'' av klassen
+fordi vekst i rom ``koster'' like mye som vekst i tid.  For eksempel
+kan vi løse multiplikasjon i fast tid ved å ha en ferdig
+multiplikasjonstabell.  Men den har jo størrelse $N^2$ og i praksis er
+derfor ingenting spart.
+
+Et språk det krever $O(N^2)$ beregninger å bestemme er klart lettere å
+håndtere enn ett som krever $O(N^3)$.  Men som alltid er alt relativt:
+I forhold til $O(2^N)$ er forskjellen mellom $O(N^2)$ og $O(N^3)$
+så liten at de er ``like''; vi kaller vekst av denne typen for
+polynomisk.
+
 
 \subsubsection{Klassen P}
 De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
@@ -127,7 +187,7 @@ klassen \textbf{P}.
 
 For eksempel \textsc{Partall}:
 \begin{equation}
-  \textsl{PARTALL}: \{n: n \textrm{er partall}
+  \textsl{lPARTALL}: \{n: n \textrm{er partall}
 \end{equation}
 Algoritmen for å bestemme om et tall er i \textsc{Partall} er å se om
 siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen) og
@@ -168,7 +228,7 @@ polynomisk.  Altså er \textsc{Sammensatt} i \textbf{NP}.  Kjernen er
 at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
 men undersøke om et bevis er gyldig.
 
-\textsc{Primes} er også i \textbf{NP} fordi det finnes et bevis somk
+\textsc{Primes} er også i \textbf{NP} fordi det finnes et bevis som
 kan verifiseres i polynomisk tid.  Dersom $n$ er prim da vil det
 finnes en $a^{n-1} = 1 (= n)$ og for hver primfaktor $q$ av
 $n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et bevis for at $n$ er
@@ -180,6 +240,33 @@ mens avgjøre om beviset på at $n$ er prim er gyldig, er et annet.
 Kravet for at et problem er i \textbf{NP} er altså at det finnes et
 bevis (og ikke nødvendigvis at beviset er ``lett'' å finne).
 
+%
+%
+\section{Problemstilling}
+
+
+
+Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
+overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
+verdi om $x$.
+
+Bidraget i artikkelen er to språk \textsc{QR} og
+\textsc{QNR} som begge har denne egenskapen: \textsl{zero-knowledgfe
+  interactive proof system}.
+
+La $x, y$ være to heltall slik at $0 < y < x$, og $\gcd(x,y) = 1$ somk
+naturligvis betyr at $x$ og $y$  ikke har noen felles (prim)faktorer).
+Vi sier at $y$ er en \emph{kvadratisk rest} $\mod x$ dersom det er
+mulig å finne en $z$ slik at $y = z² \mod x$.
+Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
+slik $z$ ikke finnes.
+
+Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
+\textsc{QNR} er fra artikkelen.}:
+\begin{equation}
+  QR = {(x,y) | y \textrm{er en kvadratisk rest $\mod x$}} \\
+  QNR = {(x,y) | y \textrm{er kvadratisk prim $\mod x$}} \\
+\end{equation}
 
 
 %%%%%%%%%%%%%%%%%%%%
