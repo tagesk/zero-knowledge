@@ -63,14 +63,25 @@ $\APri{A}$ og $\APri{B}$ lakk (meta)informasjon om $D$ til Charlie.
 
 Evnen til å kunne verifisere om $D=D^\prime$ er en betydelig fordel som
 kan gi næring til mange typer angrep.  \textit{Zero Knowledge} handler
-om å overbevise den andre om noe, uten å lekke informasjon.
+om å overbevise den andre om noe, uten å lekke informasjon.  For å
+illustrere hva som menes, la Alice og Bob sitte på hver sin side av
+bordet, med en kortstokk mellom seg.  Alice trekker et kort, og ser på
+det, og legger det med baksiden opp; kortet var rødt (hjerter eller
+ruter).  Spørsmålet er: Hvordan kan Alice overbevise Bob om at hun
+trakk et rødt kort uten å vise ham det eller avsløre noe annet av
+verdi?
 
-Under de rette antagelsene er det mye som er mulig.  I praksis er mye
-vanskelig.  Kompleksitetsteori er verktøyet for å snakke om
-antagelser, og derfor gi et mål på hvor ``vanskelig'' noe
-er. Kapittel~\ref{sec:utgangspunkt} gir nødvendig matematisk bakgrunn.
+La Alice gå gjennom stokken og plukke ut de 26 sorte kortene (kløver
+og spar) og legge dem på bordet så Bob kan se dem.  Under antagelsen
+om at kortstokken er ``ekte'' kan han konkludere uten mulighet for å
+gjøre feil at Alice trakk et rødt kort.
 
+Et essensielt element her er antagelsen osom Bob må gjøre om
+kortstokken.  Som vi skal se må det alltid gjøres antagelser; styrken
+i systemet avhenger av hva som legges til grunn.
 
+Kompleksitetsteori er verktøyet for å snakke om antagelser, og derfor
+gi et mål på hvor ``vanskelig'' noe
 
 
 %
@@ -101,39 +112,34 @@ ikke er en kant mellom nodene $i$ og $j$).  Når en slik matrise
 skrives ut blir resultatet igjen en streng (av $0$ og $1$).  Lengden
 på dette problemet er naturligvis produktet av dimensjonene.
 
-Hvordan spørsmålet rent praktisk skal besvares, dét er en annen sak.
-Oppgaven er ofte å finne en så effektiv metode som mulig.  Det er lett
-å finne ut om $N$ er prim (prøve å dividere med alle tall
-$<\sqrt{N}$) om enn tidkrevende om $N$ er stor.  Det finnes mye mer
-effektive algoritmer; det beste vi kjenner er  $\tilde{O}(\log^6
-n)$\cite{Agrawal2004}.  Det er avgjørende her å se at å avgjøre om et
-tall er prim eller ei er noe annet og mye lettere enn å faktisk finne
-primfaktorene.
-
 Når vi bruker strenger til å representere problemer på denne måten kan
 vi betrakte strengene som et ``ord''; hver streng representerer ett
 (og bare ett) problem.  Indirekte har vi nå også fått et mål på
 størrelse: Jo lenger streng jo større problem.
-Legg merke til at tallet $1234567890$ er (litt mer enn) ti ganger så
+Legg merke til at tallet $1234567890$ er ti ganger så
 stort som tallet $123456789$.  Men som problem er $1234567890$ bare
-knappe 10\% større (lengere).
+10\% større (lengere).
 
 Problemene til et gitt spørsmål er et (uendelig) sett av strenger.
 Spørsmålet deler dette settet to: De problemer som har svaret ``ja''
 og de som ikke har svaret ``ja''.
 Kombinasjonen av et spørsmål, en representasjon av problemene som skal
-besvares, settet av alle problemer, og medlemmene av settet som har
-svaret ``ja'', det kaller vi \emph{et språk}.
+besvares, settet av alle problemer (ordene), og medlemmene av settet
+som har svaret ``ja'', det kaller vi \emph{et språk}.
 
 Språket som inkluderer spørsmålet om $X$ er prim når $X \in
 \textbf{N}$ og settet med tall hvor svaret er ``ja'', det heter
 \textsc{Primes}.
 Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
-tilhører ikke alle tall språket \textsc{Primes}.
+tilhører ikke alle tall språket \textsc{Primes}. 
 
-Spørsmålet om en graf inneholder en komplett sub-graf (klikk) det
-heter \textsc{Clique}.  Språket $L_\textsc{Clique}$ er ``ord'' hvor
-svaret er ``ja'':
+Faktorisering fanges i språket \emph{FACTOR}.
+Gitt to tall $n$ og $k$, finnes det et tall $d$, mindre eller lik $k$
+som dividerer $n$.  Beviset er naturligvis $d$.
+
+\textsc{Clique} er spørsmålet om en graf inneholder en komplett
+sub-graf (klikk) med en gitt størrslse, sammen med problemene som
+representerer grafer hvor svaret er ``ja''.
 \begin{equation}
   L_{\textsc{CLIQUE}} = \{ \langle G, k \rangle \mid G \text{ har en
     klikk med størrelse } k \}
@@ -144,13 +150,20 @@ Her er $G$ en streng som representerer en graf og $k$ et tall
 
 \subsection{Kompleksitesklasser}
 
-Det viser seg at språkene faller naturlig ned i et sett med klasser:
-Vi kaller dem kompleksitetsklasser.  Klassene skiller seg fra
+Det viser seg at språkene faller naturlig ned i et sett med klasser;
+vi kaller dem kompleksitetsklasser.  Klassene skiller seg fra
 hverandre ved noen sentrale egenskaper ved de språkene som er med i
 klassen.  Det viser seg også at det er ``lett'' å konvertere et språk
 i en klasse til et annet i samme klasse.
-At noe er ``lett'' betyr her
-at det er i klassen \textbf{P} (se nedenfor).
+At noe er ``lett'' betyr her at det er i klassen \textbf{P} (se
+nedenfor).
+
+Det essensielle er at alle spørsmål i et språk er ``like''.  For
+eksempel er faktorisering av store tall som er produktet av kun to
+primfaktorer lik for alle tall av lik størrelse.  Det vil si at vi kan
+bygge en løsning rundt faktorisering uten på forhånd velge hvilke tall
+som skal inngå.  Det gjør at hver instans er ``frisk'' og med samme
+egenskaper som alle andre.
 
 \subsubsection{Vekst}
 
@@ -158,12 +171,16 @@ Når vi skal addere to tall, da legger vi først sammen siste siffer i
 begge tallene, deretter nest siste, og så videre.  Det vil si at
 kompleksiteten vokser lineært med lengden på tallene (dobbelt så lange
 tall krever dobbelt så mange operasjoner).  Vi ser utelukkende på
-tallenes lengde, ikke deres ``størrelse''.
+tallenes lengde, ikke deres ``størrelse''.  Kompleksiteten
+(arbeidsmengden) i addisjon vokser lineært med lengden på tallene som
+skal legges sammen.  
 
-Multiplikasjon krever at vi hvert siffer i tallene med hverandre, og
-summerer resultatene til slutt.  Mest arbeid er det når tallene er
-like lange.  Kompleksiteten i multiplikasjon er derfor $O{N}^2$ hvor
-$N$ her ikke er tallene men lengden på dem.
+Multiplikasjon krever at vi ganger hvert siffer i tallene med
+de andre, og summerer resultatene til slutt.  Mest arbeid er det når
+tallene er like lange.  Kompleksiteten i multiplikasjon er derfor
+$O{N}^2$ hvor $N$ her ikke er tallene men lengden.  Addisjonen vi gjør 
+til slutt blir fort neglisjerbar i forhold til selve multiplikasjonen
+fordi arbeidsmengden vokser mye raskere.
 
 Som regel kan vi bruke tid på å regne noe ut, eller pre-beregne for å
 tjene tid senere.  Det vil si bytte vekst i tid mot vekst i rom.  Det
@@ -171,16 +188,17 @@ viser seg at problemer i en klasse ikke kan ``bryte ut'' av klassen
 fordi vekst i rom ``koster'' like mye som vekst i tid.  For eksempel
 kan vi løse multiplikasjon i fast tid ved å ha en ferdig
 multiplikasjonstabell.  Men den har jo størrelse $N^2$ og i praksis er
-derfor ingenting spart.
+derfor ingenting spart.  Derfor, når kompleksiteten er, for eksempel,
+$O{N^2}$ er det enten i tid eller i rom.
+
+
+\subsubsection{Klassen P}
 
 Et språk det krever $O(N^2)$ beregninger å bestemme er klart lettere å
 håndtere enn ett som krever $O(N^3)$.  Men som alltid er alt relativt:
 I forhold til $O(2^N)$ er forskjellen mellom $O(N^2)$ og $O(N^3)$
-så liten at de er ``like''; vi kaller vekst av denne typen for
-polynomisk.
+så liten at de er ``like''.
 
-
-\subsubsection{Klassen P}
 De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
 polynomisk relativ til lengden på spørsmålet, de sies å tilhøre
 klassen \textbf{P}.
@@ -190,17 +208,30 @@ For eksempel \textsc{Partall}:
   \textsl{lPARTALL}: \{n: n \textrm{er partall}
 \end{equation}
 Algoritmen for å bestemme om et tall er i \textsc{Partall} er å se om
-siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen) og
-derfor klart mindre enn polynomisk tid.
+siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen).
 
 Gitt en graf $G$ kan vi bruke bredde-først eller dybde-først for å
-finne om én node er forbundet med en annen.  Ingen av dem vokser mer
-enn polynomisk når størrelsen på $G$ er målet.  Det vil si at språkket
-\textsc{Sti} er i \textbf{P}:
+finne om én node er forbundet med en annen.  
 \begin{equation}
   \textrm{STI} = \{(G, a, b): \textrm{Det er en sti fra $a$ til $b$ i
     $G$} 
 \end{equation}
+Hverken bredde-først eller dybde-først vokser raskene enn antall noder
+den skal besøke.  Det vil si at veksten er polynomisk når størrelsen
+på $G$ er målet.  Språket \textsc{Sti} er i \textbf{P}:
+
+Det er lett å finne ut om $n$ er prim (prøve å dividere med alle tall
+$<\sqrt{n}$) om enn tidkrevende om $n$ er stor.  Som problem i et
+språk måler vi $N$ som lengden.  Et tall som er dobbelt så
+\emph{langt} som et annet, for eksempel 20 mot 10 siffer, det er svært
+mye større.  Denne algoritmen gir derfor eksponensiell vekst i antall
+operasjoner (målt mot $N$ som er lengden av $n$).
+Heldigvsi finnes det mer effektive algoritmer; det beste vi kjenner er
+$\tilde{O}({\log}^6 n)$\cite{Agrawal2004}.  Det er avgjørende her å se
+at å avgjøre om et tall er prim eller ei er noe annet og mye lettere
+enn å faktisk finne primfaktorene.  Språket \textsc{Primes} er derfor
+i \textbf{P}.
+
 
 %
 %
@@ -219,7 +250,7 @@ løsningen.
 
 Et språk som ofte brukes som eksempel er \textsc{Sammensatt}:
 \begin{equation}
-  \textrm{SAMMENSATT}: \{n: \textrm{n er sammensatt (ikke prim)}\}
+  \textsc{Sammensatt}: \{n: \textrm{n er sammensatt (ikke prim)}\}
 \end{equation}
 Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
 Kompleksiteten ved å verifisere, altså multiplisere, øker med lengden
@@ -229,22 +260,54 @@ at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
 men undersøke om et bevis er gyldig.
 
 \textsc{Primes} er også i \textbf{NP} fordi det finnes et bevis som
-kan verifiseres i polynomisk tid.  Dersom $n$ er prim da vil det
-finnes en $a^{n-1} = 1 (= n)$ og for hver primfaktor $q$ av
-$n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et bevis for at $n$ er
-prim vil være $a$ sammen med faktoriseringen av $n-1$ (og tilsvarende
-bevis for at de faktorene er prim).
+kan verifiseres i polynomisk tid\footnote{\textsc{Primes} ble
+opprinnelig (1975) plassert i \textbf{NP}.  Senere har det vist seg å
+være i \textbf{P}, altså ``enklere'' enn man opprinnelig trodde.}.
+Dersom $n$ er prim da vil det finnes en $a^{n-1} = 1 (= n)$ og for 
+hver primfaktor $q$ av $n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et
+bevis for at $n$ er prim vil være $a$ sammen med faktoriseringen av
+$n-1$ (og tilsvarende bevis for at de faktorene er prim).
 
-Her er det viktig å huske at å finne ut om $n$ er prim er ett problem
-mens avgjøre om beviset på at $n$ er prim er gyldig, er et annet.
-Kravet for at et problem er i \textbf{NP} er altså at det finnes et
-bevis (og ikke nødvendigvis at beviset er ``lett'' å finne).
+Minner igjen om at å finne ut om $n$ er prim er ett problem mens
+avgjøre om beviset på at $n$ er prim er gyldig, er et annet. Kravet
+for at et problem er i \textbf{NP} er altså at det finnes et bevis (og
+ikke nødvendigvis at beviset er ``lett'' å finne). 
+
+%
+%
+\subsubsection{Klassen NPC}
+Noen problemer som har enkel bevis, er svært vanskelig å løse.  For eksempel
+\begin{itemize}
+\item \textsc{Travelling salesman}: Gitt en graf med vektede kanter,
+  finnes det en rute med lengde $<k$ som besøker alle noder (byer)?
+  Beviset er ruten, som er lett å verifisere har lengde mindre enn
+  $k$;
+\item \textsc{Sekkeproblemet}: Gitt et sett av gjenstander med volum og
+  verdi, finnes det et subsett av gjenstandene som til sammen har verdi
+  $>k$ og som til sammen ikke har større volum en sekken?, og
+  \item \testsc{Fargelegge en grap}: Gitt en graf hvor kantene ikke
+    har retning, og et antall farger, finnes det en måte fargelegge
+    nodene slik at ingen node har kant til en annen node med samme farge?
+\end{itemize}
+Disse, og mange andre (se\cite{GareyJohnson1979} for mer enn 300
+eksempler) er ``like'', i betydningen at de har komplieksitet som
+minst er $O(2^N)$.
+
+Problemene i \textsc{NPC} har vært studert av informatikere og
+matematikere i flere tiår.  Det er ingen tegn på at noen av dem har
+enkle løsninger.
+
+\begin{definition}[Umulig]
+Noe er \emph{umulig} dersom det er like vanskelig, eller vanskeligere, enn
+problemene i \textbf{NPC}.
+\end{definition}
+Her noterer vi med en viss interesse at hverken RSA (basert på
+\textsc{Factor} eller ECDSA (basert på \textsc{DLG}) er \emph{umulig}
+å knekke.  Vanskelig, men ikke \emph{umulig}.
 
 %
 %
 \section{Problemstilling}
-
-
 
 Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
 overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
