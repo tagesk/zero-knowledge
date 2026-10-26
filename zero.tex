@@ -76,12 +76,15 @@ og spar) og legge dem på bordet så Bob kan se dem.  Under antagelsen
 om at kortstokken er ``ekte'' kan han konkludere uten mulighet for å
 gjøre feil at Alice trakk et rødt kort.
 
-Et essensielt element her er antagelsen osom Bob må gjøre om
-kortstokken.  Som vi skal se må det alltid gjøres antagelser; styrken
-i systemet avhenger av hva som legges til grunn.
+For at denne protokollen skal fungere, må Bob akseptere en rekke svært
+heftige antagelser.  Den første handler om kortstokken; han må anta
+den har 52 kort, ikke inneholder en \emph{joker}, har 13 kort av hver
+(kort)farge, samt den fysiske omgivelsen som må etableres (hva
+innbærer det å sitte på andre siden av bordet?).
 
-Kompleksitetsteori er verktøyet for å snakke om antagelser, og derfor
-gi et mål på hvor ``vanskelig'' noe
+Som vi skal se må det alltid gjøres antagelser; styrken i systemet
+avhenger av hva som legges til grunn.  Kompleksitetsteori er verktøyet
+for å snakke om antagelser. 
 
 
 %
@@ -232,6 +235,13 @@ at å avgjøre om et tall er prim eller ei er noe annet og mye lettere
 enn å faktisk finne primfaktorene.  Språket \textsc{Primes} er derfor
 i \textbf{P}.
 
+\subsubsection{BPP (Bounded-error Probabilistic Polynomial time)}
+For at beskrivelsen skal være korrekt nevner vi at fordi det ikke er
+bevist at \textsl{psaudorandomness} i det generelle tilfellet kan
+erstatte ekte tilfeldighet, så er $\textbf{P} \subset \textbf{BPP}$.
+Men som alle andre antar vi at så er tilfelle, og at $\textbf{P} =
+\textbf{BPP}$.
+
 
 %
 %
@@ -301,6 +311,18 @@ enkle løsninger.
 Noe er \emph{umulig} dersom det er like vanskelig, eller vanskeligere, enn
 problemene i \textbf{NPC}.
 \end{definition}
+Denne definisjonen er naturligvis en svært uformell måte å uttrykke
+hvor mange beregninger som i det generelle tilfelle er nødvendig for å
+avgjøre om en streng $x \in L$, hvor $L \in \textbf{NPC}$.
+
+Det må understrekes at det er forventningen (les: sannsynligheten) som
+er hindringen.  For eksempel: Gitt et 60 sifret tall tall som er
+produktet av to 30-sifret primtall, da er det mulig å være heldig å
+gjette de to faktorene på første forsøk.  Sannsynligheten for det er
+svært liten, og derfor starter vi ikke engang på oppgaven.
+Noe er derfor \emph{umulig} dersom den forventede arbeidsmengden
+\textsc{Per Se} gjør at man avstår.
+
 Her noterer vi med en viss interesse at hverken RSA (basert på
 \textsc{Factor} eller ECDSA (basert på \textsc{DLG}) er \emph{umulig}
 å knekke.  Vanskelig, men ikke \emph{umulig}.
@@ -309,18 +331,45 @@ Her noterer vi med en viss interesse at hverken RSA (basert på
 %
 \section{Problemstilling}
 
+På et strukturelt nivå ønsker vi at Charlie, som lytter på
+kommunikasjonen mellom Alice og Bob, er i samme beregningsmessige
+posisjon etter å ha lytteat på protokollen mellom Alice og Bob som han
+var før protokollen startet.  Altså at kompleksiteten i å finne $x$
+ikke endrer seg gjennom å lytte mens Bob på sin side blir overbevist
+om at Alice kjenner $x$.
+
 Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
 overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
-verdi om $x$.
+verdi om $x$.  Konkret:
+\begin{itemize}:
+\item Dersom $x \in L$ da kan Alice overbevise Bob om det med en
+  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$, og
+\item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
+  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$.
+\end{itelize}
+Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
+sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
+gjennomføre flere runder).
 
-Bidraget i artikkelen er to språk \textsc{QR} og
-\textsc{QNR} som begge har denne egenskapen: \textsl{zero-knowledgfe
-  interactive proof system}.
+Bidraget i artikkelen er to språk \textsc{QR} og \textsc{QNR} som
+begge har egenskapen at Alice kan overbevise Bob at hun besitter en
+$x$ som er i språket, uten å avsløre $x$.
+
+\subsection{Språket QR}
+
+Formelt er \textbf{QR} settet av alle heltall $(x,y)$ slik at $y$ er
+en kvadratisk rest, modulo $x$.  Kvadratisk rest betyr at det finnes
+et heltall $z$ slik at
+$$z^2 \equiv y \pmod x$$,
+eller med andre ord, at $z$ er kvadratroten til $y$.
+
+
 
 La $x, y$ være to heltall slik at $0 < y < x$, og $\gcd(x,y) = 1$ somk
 naturligvis betyr at $x$ og $y$  ikke har noen felles (prim)faktorer).
 Vi sier at $y$ er en \emph{kvadratisk rest} $\mod x$ dersom det er
 mulig å finne en $z$ slik at $y = z² \mod x$.
+
 Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
 slik $z$ ikke finnes.
 
