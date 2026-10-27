@@ -1,11 +1,12 @@
 % -*-mode: LaTeX; coding: utf-8; -*-
-\documentclass{article}
+\documentclass[11pt, a4paper]{article}
 \usepackage[a4paper, margin=2cm]{geometry}
 % For vakker crypto.  Dokumentasjonen ligger i katalogen
 \usepackage{aspen}
 % For vakrere referanser
 \usepackage{cite}
-
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \title{Zero-knowledge proof}
 \author{[TaSK]}
@@ -351,34 +352,68 @@ Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en
 sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
 gjennomføre flere runder).
 
+\subsubsection{Isoforme grafer}
+
+Here is a complete, compilable LaTeX example showing how to structure this:
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % Replace 'graph1.png' with your first image filename
+        \includegraphics[width=\textwidth]{G1.png}
+        \caption{First Graph ($G_0$)}
+        \label{fig:graph1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        % Replace 'graph2.png' with your second image filename
+        \includegraphics[width=\textwidth]{G2.png}
+        \caption{Second Graph ($G_1$)}
+        \label{fig:graph2}
+    \end{subfigure}
+    \caption{Two graph images displayed side by side as a single figure unit.}
+    \label{fig:two_graphs}
+\end{figure}
+
+
+
+\subsection{Språkene i artikkelen}
+
 Bidraget i artikkelen er to språk \textsc{QR} og \textsc{QNR} som
 begge har egenskapen at Alice kan overbevise Bob at hun besitter en
 $x$ som er i språket, uten å avsløre $x$.
-
-\subsection{Språket QR}
 
 Formelt er \textbf{QR} settet av alle heltall $(x,y)$ slik at $y$ er
 en kvadratisk rest, modulo $x$.  Kvadratisk rest betyr at det finnes
 et heltall $z$ slik at
 $$z^2 \equiv y \pmod x$$,
-eller med andre ord, at $z$ er kvadratroten til $y$.
+eller med andre ord, at $z$ er kvadratroten til $y$.  Det antas at
+dersom $x$ er produktet av to primfaktorer, da er det ``vanskelig'' å
+finne $z$ gitt $y$.  ``Vanskelig'' betyr her at det er utenfor
+\textbf{BPP}.
 
-
-
-La $x, y$ være to heltall slik at $0 < y < x$, og $\gcd(x,y) = 1$ somk
-naturligvis betyr at $x$ og $y$  ikke har noen felles (prim)faktorer).
-Vi sier at $y$ er en \emph{kvadratisk rest} $\mod x$ dersom det er
-mulig å finne en $z$ slik at $y = z² \mod x$.
+La $x=77$ ($7\times 11$).  Da er det langt fra enkelt å avgjøre om
+$y_1=31$ og/eller $y_2=37$ er kvadratisk rest i
+\textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2=37 \pmod 77$ mens
+$31$ er ikke kvadratisk rest $\pmod 77$ ($\not\exist z, z^2=31 \pmod
+77$).}.
 
 Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
 slik $z$ ikke finnes.
 
+Den mest effektive algoritmen er å faktorisere $x$.  Språket
+\textsc{Factor} er ikke \emph{umulig} men man kjenner heller ikke noen
+løsning i polynomisk tid.
+
 Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
 \textsc{QNR} er fra artikkelen.}:
 \begin{equation}
-  QR = {(x,y) | y \textrm{er en kvadratisk rest $\mod x$}} \\
-  QNR = {(x,y) | y \textrm{er kvadratisk prim $\mod x$}} \\
+  QR = {(x,y) | y \textrm{er en kvadratisk rest $\pmod x$}} \\
+  QNR = {(x,y) | y \textrm{er kvadratisk prim $\pmod x$}} \\
 \end{equation}
+
 
 
 %%%%%%%%%%%%%%%%%%%%
