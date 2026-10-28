@@ -7,12 +7,28 @@
 \usepackage{cite}
 \usepackage{graphicx}
 \usepackage{subcaption}
+\usepackage{amssymb}
+
+\usepackage{amsthm}
+% Configure theorem style for definitions
+\theoremstyle{definition}
+\newtheorem{definition}{Definisjon}[section] % Numbered by section (e.g., Definition 2.1)
+
+\usepackage[T1]{fontenc}
+\usepackage{XCharter}         % Modern, feature-rich version of Bitstream Charter for text
+%\usepackage[eulervm]{eulervm} % Euler math fonts configured to match text weight
+% For å få dem inn:
+% sudo apt install texlive-fonts-extra
 
 \title{Zero-knowledge proof}
 \author{[TaSK]}
 \date{juni 2026}
 \begin{document}
 \maketitle
+
+
+
+
 
    
 \section{Innledning}
@@ -29,6 +45,7 @@ særdeleshet antas det ikke at kanaler tilbyr konfidensialitet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bakgrunn}
+\label{sec:bakgrunn}
 Tema er hvordan  Alice kan overbevise Bob at hun kjenner en
 hemmelighet, uten å hverken fortelle noe av verdi til Bob (ut over at
 hun kjenner hemmeligheten), og heller ikke til Charlie (som ikke
@@ -131,8 +148,8 @@ Kombinasjonen av et spørsmål, en representasjon av problemene som skal
 besvares, settet av alle problemer (ordene), og medlemmene av settet
 som har svaret ``ja'', det kaller vi \emph{et språk}.
 
-Språket som inkluderer spørsmålet om $X$ er prim når $X \in
-\textbf{N}$ og settet med tall hvor svaret er ``ja'', det heter
+Språket som inkluderer spørsmålet om $X$ er prim når
+$X \in \textbf{N}$ og settet med tall hvor svaret er ``ja'', det heter
 \textsc{Primes}.
 Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
 tilhører ikke alle tall språket \textsc{Primes}. 
@@ -205,7 +222,7 @@ så liten at de er ``like''.
 
 De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
 polynomisk relativ til lengden på spørsmålet, de sies å tilhøre
-klassen \textbf{P}.
+klassen $\mathsf{P}$.
 
 For eksempel \textsc{Partall}:
 \begin{equation}
@@ -296,7 +313,7 @@ Noen problemer som har enkel bevis, er svært vanskelig å løse.  For eksempel
 \item \textsc{Sekkeproblemet}: Gitt et sett av gjenstander med volum og
   verdi, finnes det et subsett av gjenstandene som til sammen har verdi
   $>k$ og som til sammen ikke har større volum en sekken?, og
-  \item \testsc{Fargelegge en grap}: Gitt en graf hvor kantene ikke
+\item \textsc{Fargelegge en grap}: Gitt en graf hvor kantene ikke
     har retning, og et antall farger, finnes det en måte fargelegge
     nodene slik at ingen node har kant til en annen node med samme farge?
 \end{itemize}
@@ -304,13 +321,13 @@ Disse, og mange andre (se\cite{GareyJohnson1979} for mer enn 300
 eksempler) er ``like'', i betydningen at de har komplieksitet som
 minst er $O(2^N)$.
 
-Problemene i \textsc{NPC} har vært studert av informatikere og
+Problemene i $\textsf{NPC}$ har vært studert av informatikere og
 matematikere i flere tiår.  Det er ingen tegn på at noen av dem har
 enkle løsninger.
 
 \begin{definition}[Umulig]
 Noe er \emph{umulig} dersom det er like vanskelig, eller vanskeligere, enn
-problemene i \textbf{NPC}.
+problemene i $\textsf{NPC}$.
 \end{definition}
 Denne definisjonen er naturligvis en svært uformell måte å uttrykke
 hvor mange beregninger som i det generelle tilfelle er nødvendig for å
@@ -342,42 +359,80 @@ om at Alice kjenner $x$.
 Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
 overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
 verdi om $x$.  Konkret:
-\begin{itemize}:
+\begin{itemize}
 \item Dersom $x \in L$ da kan Alice overbevise Bob om det med en
   sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$, og
 \item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
   sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$.
-\end{itelize}
+\end{itemize}
 Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
 sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
 gjennomføre flere runder).
 
-\subsubsection{Isoforme grafer}
+\subsection{Isomorfe grafer}
 
-Here is a complete, compilable LaTeX example showing how to structure this:
+Eksempelet med kortstokken vi seksjon~\ref{sec:bakgunn} illustrerte
+essensen.  For bruk mellom datamaskiner, og i særdeleshet for å
+formidle hemmeligheter, er det nødvendig med en noe mer komplisert
+omgivelse.
+
+To grafer $G_1, G_2$ er \emph{isomorfe} dersom de er ``like'' i sin
+struktur, men ikke nødvendigvis i navnet på noder og kanter.  Formelt
+er kravet en \emph{bijeksjon} mellom kantene
+
+To grafer $G_1 = (V_1, E_1)$ og $G_2 = (V_2, E_2)$  er \emph{isomorfe}
+(vi skriver $G_1 \cong G_2$) dersom, og bare dersom, det finnes en
+\emph{bijeksjon} $$f: V_1 \to V_2$$
+slik at dersom to vilkårlige noder $u, v \in V_1$ er forbundet med en
+kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbindet med en
+kant i $G_2$.
+
+Å generere en graf er lett, og det er enkelt å generere en isomorf
+kopi av en graf.  Det er i praksis ``bare'' å flytte rundt på det som
+identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
+navn.
+Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
+som viser hvordan identifikatorene på nodene er knyttet til hverandre.
+Listen er naturligvis like lang som det er noder i grafen.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        % Replace 'graph1.png' with your first image filename
         \includegraphics[width=\textwidth]{G1.png}
-        \caption{First Graph ($G_0$)}
+        \caption{Grafen $G_1$}
         \label{fig:graph1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        % Replace 'graph2.png' with your second image filename
         \includegraphics[width=\textwidth]{G2.png}
-        \caption{Second Graph ($G_1$)}
+        \caption{Grafen $G_2$}
         \label{fig:graph2}
     \end{subfigure}
-    \caption{Two graph images displayed side by side as a single figure unit.}
+    \caption{To grafer som er isomorfe.  Hele poenget er at det ikke
+      er lett å se.  Mappingen her er 0:1, 1:2, 2:0, 3:4, 4:8, 5:5,
+      6:9, 7:6, 8:3, 9:7.}
     \label{fig:two_graphs}
 \end{figure}
 
 
+Det er ikke er lett å avgjøre om to grafer er
+isomorfe.  Språket \textsc{Grafisomorfisme} er ikke i $\mathsf{P}$.
+
+
+
+Grafene $G_1$ og $G_2$ er offentlige.  $\APri{A}$  kjenner mappingen
+mellom de to grafene, og ønsker å overbevise $\APri{B}$ om det;
+$\APri{B}$ kjenner også mappingen.  Protokollen har fire steg som
+utføres helt til $\APri{A}$   er fornøyd; vi kommer tilbake til hva
+det betyr:
+\begin{enumeration}
+\item $\APri{A}$ generer $H$ som 
+
+
+  $\APri{A}$  
+\end{enumeration}  
 
 \subsection{Språkene i artikkelen}
 
@@ -396,8 +451,8 @@ finne $z$ gitt $y$.  ``Vanskelig'' betyr her at det er utenfor
 
 La $x=77$ ($7\times 11$).  Da er det langt fra enkelt å avgjøre om
 $y_1=31$ og/eller $y_2=37$ er kvadratisk rest i
-\textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2=37 \pmod 77$ mens
-$31$ er ikke kvadratisk rest $\pmod 77$ ($\not\exist z, z^2=31 \pmod
+\textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2\equiv37 \pmod 77$ mens
+$31$ er ikke kvadratisk rest $\pmod 77$ (det vil si $\nexists z: z^2\equiv31 \pmod
 77$).}.
 
 Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
