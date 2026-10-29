@@ -393,7 +393,7 @@ identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
 navn.
 Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
 som viser hvordan identifikatorene på nodene er knyttet til hverandre.
-Listen er naturligvis like lang som det er noder i grafen.
+Listen er naturligvis like lang som det er noder i grafen.  
 
 \begin{figure}[htbp]
     \centering
@@ -416,23 +416,52 @@ Listen er naturligvis like lang som det er noder i grafen.
     \label{fig:two_graphs}
 \end{figure}
 
+Selve mappingen er en liste med navn (på noder, se
+Figur~\ref{fig:two_graphs}.  Den forteller ingenting om grafenes
+struktur (som er det isomorfi handler om).  Særlig: Gitt en graf og en
+mapping kan man (kun) lære at det finnes en isimorf graf, men verdien
+av den kunnskapen er null.
 
 Det er ikke er lett å avgjøre om to grafer er
-isomorfe.  Språket \textsc{Grafisomorfisme} er ikke i $\mathsf{P}$.
+isomorfe, selv om det ikke er \emph{umulig}.  Språket
+\textsc{Grafisomorfisme} er ikke i $\mathsf{P}$, heller ikke i
+$\textsf{NPC}$, men sitter i midten (sammen med \textsc{Factor}).
+Gitt en mapping fra én graf til en annen er det trivielt å verifisere
+at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
+$\mathsf{NP}$.
 
+Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kuenner
+en hemmelighet, det vil si mappingen mellom to isomorfe grafer, uten å
+avsløre noe om grafene.  Det vil si: en \textsc{Zero Knowledge
+Protocol}. 
 
+Grafene $G_1$ og $G_2$ er offentlige.  Både $\APri{A}$ og $\APri{B}$
+kjenner mappingen mellom de to grafene, og $\APri{A}$ ønsker å
+overbevise $\APri{B}$ om at så er tilfelle.
+Protokollen har fire steg somutføres helt til $\APri{A}$ er fornøyd;
+vi kommer tilbake til hva det konkret betyr.
 
-Grafene $G_1$ og $G_2$ er offentlige.  $\APri{A}$  kjenner mappingen
-mellom de to grafene, og ønsker å overbevise $\APri{B}$ om det;
-$\APri{B}$ kjenner også mappingen.  Protokollen har fire steg som
-utføres helt til $\APri{A}$   er fornøyd; vi kommer tilbake til hva
-det betyr:
-\begin{enumeration}
-\item $\APri{A}$ generer $H$ som 
+\begin{ASteps*}
+  \ASend*{B}{A}{\AVar{H}} \\
+  \ASend*{B}{A}{\ARandom{\alpha}}\\
+  \ASend*{A}{B}{\AVar{m}}
+\end{ASteps*}
 
-
-  $\APri{A}$  
-\end{enumeration}  
+\begin{enumerate}
+\item \APri{A} generer en isomorf kopi $H$ av $G_1$.  Mappingen
+  mellom $G_1$ og $H$ kaller vi $M_1$ og mappingen mellom $G_2$ og $H$
+  kaller vi $M_2$.  \APri{A} sender $H$ til 
+  \APri{B}.  \APri{C} ser kun en graf han mistenker er isomorf med
+  $G_1$ (men kan ikke verifisere det);
+\item Etter å ha mottatt $H$, genererer \APri{B} et tilfeldig tall
+  $\alpha \in \{1,2\}$ og sender til \APri{A}.  Vi noterer at dette
+  steget åpner spørsmålet om protokollen er i $\mathsf{P}$ eller
+  $\mathsf{BPP}$ -- et spørsmål vi naturligvis lar ligge;
+\item Dersom $\alpha=1$ da sender \APri{A} $M_1$ til \APri{B}.
+  Dersom $\alpha = 2$ sendes $M_2$.  I begge tilfellene ser \APri{C}
+  kune en liste med verdier som er like lang som det er noder i
+  grafen.  Han lærer ikke noe om grafenes struktur.
+\end{enumerate}  
 
 \subsection{Språkene i artikkelen}
 
