@@ -393,7 +393,10 @@ identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
 navn.
 Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
 som viser hvordan identifikatorene på nodene er knyttet til hverandre.
-Listen er naturligvis like lang som det er noder i grafen.  
+Listen er naturligvis like lang som det er noder i grafen.  En slik
+mapping kan brukes begge veier, og i flere ledd; én graf brukes til å
+generere en ny, som brukes\ldots  Vi skal komme tilbake til denne
+egenskapen litt senere.
 
 \begin{figure}[htbp]
     \centering
@@ -422,37 +425,45 @@ struktur (som er det isomorfi handler om).  Særlig: Gitt en graf og en
 mapping kan man (kun) lære at det finnes en isimorf graf, men verdien
 av den kunnskapen er null.
 
-Det er ikke er lett å avgjøre om to grafer er
-isomorfe, selv om det ikke er \emph{umulig}.  Språket
-\textsc{Grafisomorfisme} er ikke i $\mathsf{P}$, heller ikke i
-$\textsf{NPC}$, men sitter i midten (sammen med \textsc{Factor}).
+Det er ikke er lett å avgjøre om to grafer er isomorfe, selv om det
+ikke er \emph{umulig}.  Språket \textsc{Grafisomorfisme} er ikke i
+$\mathsf{P}$, heller ikke i $\textsf{NPC}$, men sitter trolig ``i midten''
+(sammen med \textsc{Factor}); det hele avhenger av om
+$\mathsf{P} = \mathsf{NP}$.
 Gitt en mapping fra én graf til en annen er det trivielt å verifisere
 at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
 $\mathsf{NP}$.
 
 Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kuenner
 en hemmelighet, det vil si mappingen mellom to isomorfe grafer, uten å
-avsløre noe om grafene.  Det vil si: en \textsc{Zero Knowledge
+avsløre noe om grafene.  Det vil si: en \textsc{Zero-Knowledge
 Protocol}. 
 
-Grafene $G_1$ og $G_2$ er offentlige.  Både $\APri{A}$ og $\APri{B}$
-kjenner mappingen mellom de to grafene, og $\APri{A}$ ønsker å
-overbevise $\APri{B}$ om at så er tilfelle.
-Protokollen har fire steg somutføres helt til $\APri{A}$ er fornøyd;
+Grafene $G_1$ og $G_2$ er offentlige, formodentlig produsert av Bob.
+Han har først generert $G_1$ og fra den laget en kopi, med andre
+identifikatorer på nodene.  Fordi han har laget de to grafene, kjenner
+han mappingen mellom nodene.
+
+\APri{A} kjenner også mappingen, og ønsker å overbevise \APri{B} om at
+så er tilfelle.
+Protokollen har tre meldinger kjøres til \APri{A} er fornøyd;
 vi kommer tilbake til hva det konkret betyr.
 
-\begin{ASteps*}
-  \ASend*{B}{A}{\AVar{H}} \\
-  \ASend*{B}{A}{\ARandom{\alpha}}\\
-  \ASend*{A}{B}{\AVar{m}}
-\end{ASteps*}
+\begin{ASteps}
+  \ASend*{B}{A}{\AVar{H}}[1] \\
+  \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
+  \ASend*{A}{B}{\AVar{M}}[3]
+\end{ASteps}
+
+Meldingene og beregningene er som følger:
 
 \begin{enumerate}
 \item \APri{A} generer en isomorf kopi $H$ av $G_1$.  Mappingen
-  mellom $G_1$ og $H$ kaller vi $M_1$ og mappingen mellom $G_2$ og $H$
-  kaller vi $M_2$.  \APri{A} sender $H$ til 
+  mellom $G_1$ og $H$ kaller vi \AVar{m_1} og mappingen mellom $G_2$ og $H$
+  kaller vi \AVar{M_2}.  \APri{A} sender $H$ til 
   \APri{B}.  \APri{C} ser kun en graf han mistenker er isomorf med
-  $G_1$ (men kan ikke verifisere det);
+  $G_1$ men kan i praksis ikke verifisere at det er tilfelle (fordi
+  \textsc{Grafisomorfi} ikke er i $\mathsf{BPP}$);
 \item Etter å ha mottatt $H$, genererer \APri{B} et tilfeldig tall
   $\alpha \in \{1,2\}$ og sender til \APri{A}.  Vi noterer at dette
   steget åpner spørsmålet om protokollen er i $\mathsf{P}$ eller
@@ -460,8 +471,79 @@ vi kommer tilbake til hva det konkret betyr.
 \item Dersom $\alpha=1$ da sender \APri{A} $M_1$ til \APri{B}.
   Dersom $\alpha = 2$ sendes $M_2$.  I begge tilfellene ser \APri{C}
   kune en liste med verdier som er like lang som det er noder i
-  grafen.  Han lærer ikke noe om grafenes struktur.
-\end{enumerate}  
+  grafen.
+\end{enumerate}
+
+Alice har $p=1/2$ sannsynlighet for å svare rett.  Det vil si at for
+hver runde Alice svarer riktig synker sannsynligheten for at Alice
+bare gjetter til halvparten.  Bob kan be Alice fortsette (kjøre runde
+etter runde) til han er overbevist (sannsynligheten blir
+tilfedsstillende lav).
+
+Her er vi ved en ny antagelse: Akkurat som det er like usikkert at
+\textsc{Grafisomorfi} er i $\mathsf{BPP}$ som at
+\textsc{Faktorisering} er det--alle som bruker RSA i sin PKI (for
+eksempel PIT) antar at $\mathsf{P} \not= \mathsf{BPP}$--en antagelse
+at $p=2^{-64}$ (eller hva nå Bob velger) er tilstrekkelig til å
+kategorisere det som ``sikkert''.
+
+Vi bruker vår intuisjon, og konkluderer med at konseptet
+\textsc{Zero-Knowlede Protocol} faktisk lar seg realisere, og vil
+fungere under de rette antagelsene.
+Imidlertid er det ikke \emph{umulig} å bryte sikkerheten, for det
+underliggende problemet (\textsc{Grafisomorfi}) ikke er i
+$\textsf{NPC}$.
+
+Et spørsmål for \textit{connoisseurs} er om resultatet (for Bob) blir
+det sammen om rundene kjører i parallell; det åpner svært utfordrende
+analytiske arenaer man kan danse på, men vi går ikke nærmere inn på.
+det her.
+
+\subsection{Kryptering}
+
+Før vi kan gå vidre trenger vi å diskutere hvilke antagelser
+kryptering krever.  Det vanlige er å helt enkelt anta at
+\textsc{Factor} og/eller \textsc{DLG} ikke er i $\textsf{BPP}$.  Et
+viktig tema i dette notatet er å få grep om antagelser, og da er
+kryptering viktig.
+
+Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det som er
+mulig er å vise at et (sett) med problemer er i samme
+kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
+svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
+nettopp er knyttet til programvare heller enn teori.
+
+Shannon~\cite{Shannon1949Communication} viste for et par generasjoner
+siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
+under antagelsen om ``ekte'' tilfeldighet er det eneste sikre.  I
+praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
+er fra vår egen levetid og er at krypteringen er sikker i møte med
+enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
+spørsmål i et språk som er med i
+$\mathsf{BPP}$~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
+det på, er at med mindre en kjent (og akseptert) antagelser--for
+eksempel $\mathsf{P} \not= \mathsf{NP}$--ikke lenger holder, så holder
+krypteringen (igjen, med forbehold om feil i programvare).
+
+Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{PKI} til å
+knytte entiteter som deltagere og kyrpteringsnøkler sammen gjennom
+kanaler~\cite{Lampson1992Authentication}.  Fordi
+offentlig-nøkkel--kryptering hviler på svært mange antagelser legger
+vi slike løsninger bort uten mer om-og-men.  Det eneste kloke er å bruke
+delt-nøkkel kryptering til å sikre informasjon som brukes til å
+formidle kunnskap om hemmeligheter;
+Shannon~\cite{Shannon1949Communication} diskuterer utelukkende
+delf-nøkkel (av åpenbare grunner). 
+
+Som kjent er kvantedatamaskiner så kraftige at de trolig kan svare på
+spørsmål i språk utenfor $\mathsf{BPP}$; her ligger årsaken til at
+kvantemaskiner og kryptering ofte okkuperer plass i samme setning.  Vi
+sover likevel godt om natten vel vitende om at kryptografi som kan
+motstå kvante-maskiner er velkjente.
+
+
+
+
 
 \subsection{Språkene i artikkelen}
 
