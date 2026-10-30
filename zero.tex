@@ -499,6 +499,43 @@ det sammen om rundene kjører i parallell; det åpner svært utfordrende
 analytiske arenaer man kan danse på, men vi går ikke nærmere inn på.
 det her.
 
+\subsection{Fargelegge en graf}
+
+Gitt en graf, kan man fargelegge alle nodene med tre (3) farger slik
+at ingen noder med lik farge er forbundet med en kant.  Åpenbart, om
+én (eller flere) noder har mer enn tre kanter er svaret nei.  La oss
+holde slike trivielle løsninger utenfor.
+
+La $\mathsf{L}$ være språket om holder alle grafer hvor det er mulig å
+farvelegge nodene med tre (3) farger uten at noen noder med lik farge
+er knyttet sammen med en kant.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{3_colorable_graph.png}
+        \caption{En graf riktig farvelagt}
+        \label{fig:graph1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{3_NON_colorable_graph.png}
+        \caption{Kan ikke fargelegges med 3 farger}
+        \label{fig:graph2}
+    \end{subfigure}
+    \caption{To grafer med tre og fire farger, respektive}
+    \label{fig:two_graphs}
+\end{figure}
+
+Språket kalles \textsc{3-colour} og det har vært kjent i mer enn 50
+år det er i $\mathsf{NPC}$~\cite{Karp1972Reducibility,
+GareyJohnson1979}.  Det vil si at problemer som kan reduseres til
+\textsc{3-colour} er \emph{umulig} å løse.
+
+
+
 \subsection{Kryptering}
 
 Før vi kan gå vidre trenger vi å diskutere hvilke antagelser
