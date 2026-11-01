@@ -227,7 +227,7 @@ så liten at de er ``like''.
 
 De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
 polynomisk relativ til lengden på spørsmålet, de sies å tilhøre
-klassen $\mathsf{P}$.
+klassen $\mathcal{P}$.
 
 For eksempel \textsc{Partall}:
 \begin{equation}
@@ -236,12 +236,8 @@ For eksempel \textsc{Partall}:
 Algoritmen for å bestemme om et tall er i \textsc{Partall} er å se om
 siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen).
 
-Gitt en graf $G$ kan vi bruke bredde-først eller dybde-først for å
-finne om én node er forbundet med en annen.  
-\begin{equation}
-  \textrm{STI} = \{(G, a, b): \textrm{Det er en sti fra $a$ til $b$ i
-    $G$} 
-\end{equation}
+\textsc{Sti} som gitt en
+graf $G$ og to noder $a,b$ spør om det er en sti mellom dem.
 Hverken bredde-først eller dybde-først vokser raskene enn antall noder
 den skal besøke.  Det vil si at veksten er polynomisk når størrelsen
 på $G$ er målet.  Språket \textsc{Sti} er i $\mathcal{P}$.
@@ -275,15 +271,15 @@ bevis\footnote{På engelsk har \emph{proof} og \emph{evidence}
 forskjellig betydning.  Når vi snakker om \emph{bevis} her mener vi
 \emph{evidence}.} på at en instans har ``ja''-svar i polynomisk tid.
 
-For å se at $P$ er innholdt i $NP$ er det tilstrekkelig å notere at
-elementene  i $P$ kan konstrueres i polynomisk tid.  Det vil si det
+For å se at $\mathcal{P}$ er innholdt i $\mathcal{NP}$ er det
+tilstrekkelig å notere at 
+elementene  i $\mathcal{P}$ kan konstrueres i polynomisk tid.  Det vil
+si det 
 ikke er behov for noe bevis i det hele tatt; man kan bare regne ut
 løsningen.
 
-Et språk som ofte brukes som eksempel er \textsc{Sammensatt}:
-\begin{equation}
-  \textsc{Sammensatt}: \{n: \textrm{n er sammensatt (ikke prim)}\}
-\end{equation}
+Et språk som ofte brukes som eksempel er \textsc{Sammensatt}: Gitt et
+heltall $n$, er det sammensatt (ikke prim)?
 Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
 Kompleksiteten ved å verifisere, altså multiplisere, øker med lengden
 på $x$ og $y$ (som naturligvis øker med lengden på $n$), men kun
@@ -403,12 +399,12 @@ av den kunnskapen er null.
 
 Det er ikke er lett å avgjøre om to grafer er isomorfe, selv om det
 ikke er \emph{umulig}.  Språket \textsc{Grafisomorfisme} er ikke i
-$\mathsf{P}$, heller ikke i $\textsf{NPC}$, men sitter trolig ``i midten''
+$\mathcal{P}$, heller ikke i $\mathcal{NPC}$, men sitter trolig ``i midten''
 (sammen med \textsc{Factor}); det hele avhenger av om
-$\mathsf{P} = \mathsf{NP}$.
+$\mathcal{P} = \mathcal{NP}$.
 Gitt en mapping fra én graf til en annen er det trivielt å verifisere
 at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
-$\mathsf{NP}$.
+$\mathcal{NP}$.
 
 
 %
@@ -422,7 +418,7 @@ $n=5$ er det klart at om én (ellere flere) noder har mer enn 5 kanter
 er svaret nei.  For å gjøre oppsettet så enkelt som muolig velger vi
 $n=3$. 
 
-La $\mathsf{L}$ være språket om holder alle grafer hvor det er mulig å
+La $\mathcal{L}$ være språket om holder alle grafer hvor det er mulig å
 farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
 er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
 
@@ -446,7 +442,7 @@ er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
 \end{figure}
 
 Det har vært kjent i mer enn 50 år at \textsc{3-colour} er i
-$\mathsf{NPC}$~\cite{Karp1972Reducibility, 
+$\mathcal{NPC}$~\cite{Karp1972Reducibility, 
 GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
 språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
 annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
@@ -482,9 +478,9 @@ praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
 er fra vår egen levetid og er at krypteringen er sikker i møte med
 enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
 spørsmål i et språk som er med i
-$\mathsf{BPP}$~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
+$\mathcal{BPP}$~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
 det på, er at med mindre en kjent (og akseptert) antagelser--for
-eksempel $\mathsf{P} \not= \mathsf{NP}$--ikke lenger holder, så holder
+eksempel $\mathcal{P} \not= \mathcal{NP}$--ikke lenger holder, så holder
 krypteringen (igjen, med forbehold om feil i programvare).
 
 Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{PKI} til å
@@ -497,7 +493,7 @@ formidle kunnskap om hemmeligheter;
 
 Som kjent har kvantedatamaskineren annen beregningsmodell (ikke basert
 på Turing).  Det ser derfor ut til at de kan svare på spørsmål i språk
-utenfor $\mathsf{BPP}$; her ligger årsaken til at kvantemaskiner og
+utenfor $\mathcal{BPP}$; her ligger årsaken til at kvantemaskiner og
 kryptering ofte okkuperer plass i samme setning.  Vi sover likevel
 godt om natten vel vitende om at kryptografi som kan motstå
 kvante-maskiner er velkjente.
@@ -527,17 +523,20 @@ overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
 verdi om $x$.  Konkret:
 \begin{itemize}
 \item Dersom $x \in L$ da kan Alice overbevise Bob om det med en
-  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$, og
+  sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$, og
 \item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
-  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$.
+  sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$.
 \end{itemize}
 Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
 sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
 gjennomføre flere runder).
 
 
-Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kuenner
-en hemmelighet, det vil si mappingen mellom to isomorfe grafer, uten å
+
+\subsection{Protokoll basert på isomorfi}
+
+Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kjenner
+en hemmelighet basert på mappingen mellom to isomorfe grafer, uten å
 avsløre noe om grafene.  Det vil si: en \textsc{Zero-Knowledge
 Protocol}. 
 
@@ -565,11 +564,11 @@ Meldingene og beregningene er som følger:
   kaller vi \AVar{M_2}.  \APri{A} sender $H$ til 
   \APri{B}.  \APri{C} ser kun en graf han mistenker er isomorf med
   $G_1$ men kan i praksis ikke verifisere at det er tilfelle (fordi
-  \textsc{Grafisomorfi} ikke er i $\mathsf{BPP}$);
+  \textsc{Grafisomorfi} ikke er i $\mathcal{BPP}$);
 \item Etter å ha mottatt $H$, genererer \APri{B} et tilfeldig tall
   $\alpha \in \{1,2\}$ og sender til \APri{A}.  Vi noterer at dette
-  steget åpner spørsmålet om protokollen er i $\mathsf{P}$ eller
-  $\mathsf{BPP}$ -- et spørsmål vi naturligvis lar ligge;
+  steget åpner spørsmålet om protokollen er i $\mathcal{P}$ eller
+  $\mathcal{BPP}$ -- et spørsmål vi naturligvis lar ligge;
 \item Dersom $\alpha=1$ da sender \APri{A} $M_1$ til \APri{B}.
   Dersom $\alpha = 2$ sendes $M_2$.  I begge tilfellene ser \APri{C}
   kune en liste med verdier som er like lang som det er noder i
@@ -583,9 +582,9 @@ etter runde) til han er overbevist (sannsynligheten blir
 tilfedsstillende lav).
 
 Her er vi ved en ny antagelse: Akkurat som det er like usikkert at
-\textsc{Grafisomorfi} er i $\mathsf{BPP}$ som at
+\textsc{Grafisomorfi} er i $\mathcal{BPP}$ som at
 \textsc{Faktorisering} er det--alle som bruker RSA i sin PKI (for
-eksempel PIT) antar at $\mathsf{P} \not= \mathsf{BPP}$--en antagelse
+eksempel PIT) antar at $\mathcal{P} \not= \mathcal{BPP}$--en antagelse
 at $p=2^{-64}$ (eller hva nå Bob velger) er tilstrekkelig til å
 kategorisere det som ``sikkert''.
 
@@ -594,7 +593,7 @@ Vi bruker vår intuisjon, og konkluderer med at konseptet
 fungere under de rette antagelsene.
 Imidlertid er det ikke \emph{umulig} å bryte sikkerheten, for det
 underliggende problemet (\textsc{Grafisomorfi}) ikke er i
-$\textsf{NPC}$.
+$\mathcal{NPC}$.
 
 Et spørsmål for \textit{connoisseurs} er om resultatet (for Bob) blir
 det sammen om rundene kjører i parallell; det åpner svært utfordrende
@@ -604,8 +603,8 @@ det her.
 
 Et viktig bidrag i artikkelen er å vise at vi man bruke
 \textsc{3-colour} til å realisere en \textsc{Zero-Knowledle Protocol}.
-Resultatet forlenges til å vise at allt språk i $\mathsf{NP}$, og
-derfor alle språk i $\mathsf{NPC}$ kan brukes til å bygge en slik
+Resultatet forlenges til å vise at allt språk i $\mathcal{NP}$, og
+derfor alle språk i $\mathcal{NPC}$ kan brukes til å bygge en slik
 protokoll.
 
 
