@@ -404,14 +404,14 @@ egenskapen litt senere.
         \centering
         \includegraphics[width=\textwidth]{G1.png}
         \caption{Grafen $G_1$}
-        \label{fig:graph1}
+        \label{fig:iso-1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{G2.png}
         \caption{Grafen $G_2$}
-        \label{fig:graph2}
+        \label{fig:iso-2}
     \end{subfigure}
     \caption{To grafer som er isomorfe.  Hele poenget er at det ikke
       er lett å se.  Mappingen her er 0:1, 1:2, 2:0, 3:4, 4:8, 5:5,
@@ -518,14 +518,14 @@ er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
         \centering
         \includegraphics[width=\textwidth]{3_colorable_graph.png}
         \caption{En graf riktig farvelagt}
-        \label{fig:graph1}
+        \label{fig:farge-1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{3_NON_colorable_graph.png}
         \caption{Kan ikke fargelegges med 3 farger}
-        \label{fig:graph2}
+        \label{fig:farge-2}
     \end{subfigure}
     \caption{To grafer med tre og fire farger, respektive}
     \label{fig:two_graphs}
@@ -628,9 +628,9 @@ Protokollen har tre meldinger, og gjentas til Bob fornøyd; mer om hva
 det innebærer nedenfor.
 %
 \begin{enumerate}
-\item \Apri{A} genrerer en kopi av $G$ og randomiserer nodenavnene.
+\item \APri{A} genrerer en kopi av $G$ og randomiserer nodenavnene.
   Det gir en annen (men strukturelt lik) fargelegging av nodene og
-  formelt er $\pi \in_R \Sym(\{1,2,3\})$ (som betyr at av settet av
+  formelt er $\pi \in_R Sym(\{1,2,3\})$ (som betyr at av settet av
   alle permutasjoner av settet av farger (her 3) velges én).  A
   genererer tilfeldige krypteringsnøkler $r_v$ og beregner
   $R_v = krypt(\pi(\phi(v)), r_v)$ for alle $v \in V$.
