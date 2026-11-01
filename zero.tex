@@ -151,7 +151,7 @@ besvares, settet av alle problemer (ordene), og medlemmene av settet
 som har svaret ``ja'', det kaller vi \emph{et språk}.
 
 Språket som inkluderer spørsmålet om $X$ er prim når
-$X \in \textbf{N}$ og settet med tall hvor svaret er ``ja'', det heter
+$X \in \mathbb{N}$ og settet med tall hvor svaret er ``ja'', det heter
 \textsc{Primes}.
 Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
 tilhører ikke alle tall språket \textsc{Primes}. 
@@ -178,7 +178,7 @@ vi kaller dem kompleksitetsklasser.  Klassene skiller seg fra
 hverandre ved noen sentrale egenskaper ved de språkene som er med i
 klassen.  Det viser seg også at det er ``lett'' å konvertere et språk
 i en klasse til et annet i samme klasse.
-At noe er ``lett'' betyr her at det er i klassen \textbf{P} (se
+At noe er ``lett'' betyr her at det er i klassen $\mathcal{P}$ (se
 nedenfor).
 
 Det essensielle er at alle spørsmål i et språk er ``like''.  For
@@ -212,14 +212,17 @@ fordi vekst i rom ``koster'' like mye som vekst i tid.  For eksempel
 kan vi løse multiplikasjon i fast tid ved å ha en ferdig
 multiplikasjonstabell.  Men den har jo størrelse $N^2$ og i praksis er
 derfor ingenting spart.  Derfor, når kompleksiteten er, for eksempel,
-$O{N^2}$ er det enten i tid eller i rom.
+$\mathcal{O}(N^2)$ er det enten i tid eller i rom.
 
 
 \subsubsection{Klassen P}
 
-Et språk det krever $O(N^2)$ beregninger å bestemme er klart lettere å
-håndtere enn ett som krever $O(N^3)$.  Men som alltid er alt relativt:
-I forhold til $O(2^N)$ er forskjellen mellom $O(N^2)$ og $O(N^3)$
+Et språk det krever $\mathcal{O}(N^2)$ beregninger å bestemme er klart
+lettere å 
+håndtere enn ett som krever $\mathcal{O}(N^3)$.  Men som alltid er alt
+relativt: 
+I forhold til $\mathcal{O}(2^N)$ er forskjellen mellom
+$\mathcal{O}(N^2)$ og $\mathcal{O}(N^3)$ 
 så liten at de er ``like''.
 
 De språkene som kan konstrueres i tid og rom som ikke vokser mer enn
@@ -241,7 +244,7 @@ finne om én node er forbundet med en annen.
 \end{equation}
 Hverken bredde-først eller dybde-først vokser raskene enn antall noder
 den skal besøke.  Det vil si at veksten er polynomisk når størrelsen
-på $G$ er målet.  Språket \textsc{Sti} er i \textbf{P}:
+på $G$ er målet.  Språket \textsc{Sti} er i $\mathcal{P}$.
 
 Det er lett å finne ut om $n$ er prim (prøve å dividere med alle tall
 $<\sqrt{n}$) om enn tidkrevende om $n$ er stor.  Som problem i et
@@ -250,24 +253,23 @@ språk måler vi $N$ som lengden.  Et tall som er dobbelt så
 mye større.  Denne algoritmen gir derfor eksponensiell vekst i antall
 operasjoner (målt mot $N$ som er lengden av $n$).
 Heldigvsi finnes det mer effektive algoritmer; det beste vi kjenner er
-$\tilde{O}({\log}^6 n)$\cite{Agrawal2004}.  Det er avgjørende her å se
+$\mathcal{O}({\log}^6 n)$\cite{Agrawal2004}.  Det er avgjørende her å se
 at å avgjøre om et tall er prim eller ei er noe annet og mye lettere
 enn å faktisk finne primfaktorene.  Språket \textsc{Primes} er derfor
-i \textbf{P}.
+i $\mathcal{P}$.
 
 \subsubsection{BPP (Bounded-error Probabilistic Polynomial time)}
 For at beskrivelsen skal være korrekt nevner vi at fordi det ikke er
 bevist at \textsl{psaudorandomness} i det generelle tilfellet kan
-erstatte ekte tilfeldighet, så er $\textbf{P} \subset \textbf{BPP}$.
-Men som alle andre antar vi at så er tilfelle, og at $\textbf{P} =
-\textbf{BPP}$.
-
+erstatte ekte tilfeldighet, så er $\mathcal{P} \subset \mathcal{BPP}$.
+Men som alle andre antar vi at så er tilfelle, og at $\mathcal{P} =
+\mathcal{BPP}$.
 
 %
 %
 \subsubsection{Klassen NP}
 
-En annen klasse, som inkluderer settet \textbf{P}, er \textbf{NP}.
+En annen klasse, som inkluderer settet $\mathcal{P}$, er $\mathcal{NP}$.
 Språk i denne klassen er de hvor det er mulig å verifisere et
 bevis\footnote{På engelsk har \emph{proof} og \emph{evidence}
 forskjellig betydning.  Når vi snakker om \emph{bevis} her mener vi
@@ -285,14 +287,14 @@ Et språk som ofte brukes som eksempel er \textsc{Sammensatt}:
 Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
 Kompleksiteten ved å verifisere, altså multiplisere, øker med lengden
 på $x$ og $y$ (som naturligvis øker med lengden på $n$), men kun
-polynomisk.  Altså er \textsc{Sammensatt} i \textbf{NP}.  Kjernen er
+polynomisk.  Altså er \textsc{Sammensatt} i $\mathcal{NP}$.  Kjernen er
 at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
 men undersøke om et bevis er gyldig.
 
-\textsc{Primes} er også i \textbf{NP} fordi det finnes et bevis som
+\textsc{Primes} er også i $\mathcal{NP}$ fordi det finnes et bevis som
 kan verifiseres i polynomisk tid\footnote{\textsc{Primes} ble
-opprinnelig (1975) plassert i \textbf{NP}.  Senere har det vist seg å
-være i \textbf{P}, altså ``enklere'' enn man opprinnelig trodde.}.
+opprinnelig (1975) plassert i $\mathcal{NP}$.  Senere har det vist seg å
+være i $\mathcal{P}$, altså ``enklere'' enn man opprinnelig trodde.}.
 Dersom $n$ er prim da vil det finnes en $a^{n-1} = 1 (= n)$ og for 
 hver primfaktor $q$ av $n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et
 bevis for at $n$ er prim vil være $a$ sammen med faktoriseringen av
@@ -300,7 +302,7 @@ $n-1$ (og tilsvarende bevis for at de faktorene er prim).
 
 Minner igjen om at å finne ut om $n$ er prim er ett problem mens
 avgjøre om beviset på at $n$ er prim er gyldig, er et annet. Kravet
-for at et problem er i \textbf{NP} er altså at det finnes et bevis (og
+for at et problem er i $\mathcal{NP}$ er altså at det finnes et bevis (og
 ikke nødvendigvis at beviset er ``lett'' å finne). 
 
 %
@@ -333,7 +335,7 @@ problemene i $\textsf{NPC}$.
 \end{definition}
 Denne definisjonen er naturligvis en svært uformell måte å uttrykke
 hvor mange beregninger som i det generelle tilfelle er nødvendig for å
-avgjøre om en streng $x \in L$, hvor $L \in \textbf{NPC}$.
+avgjøre om en streng $x \in L$, hvor $L \in \mathcal{NPC}$.
 
 Det må understrekes at det er forventningen (les: sannsynligheten) som
 er hindringen.  For eksempel: Gitt et 60 sifret tall tall som er
