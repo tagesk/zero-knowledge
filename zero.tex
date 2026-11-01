@@ -501,14 +501,16 @@ det her.
 
 \subsection{Fargelegge en graf}
 
-Gitt en graf, kan man fargelegge alle nodene med tre (3) farger slik
-at ingen noder med lik farge er forbundet med en kant.  Åpenbart, om
-én (eller flere) noder har mer enn tre kanter er svaret nei.  La oss
-holde slike trivielle løsninger utenfor.
+Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
+$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
+at ingen noder med lik farge er forbundet med en kant?  Om vi velger
+$n=5$ er det klart at om én (ellere flere) noder har mer enn 5 kanter
+er svaret nei.  For å gjøre oppsettet så enkelt som muolig velger vi
+$n=3$. 
 
 La $\mathsf{L}$ være språket om holder alle grafer hvor det er mulig å
-farvelegge nodene med tre (3) farger uten at noen noder med lik farge
-er knyttet sammen med en kant.
+farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
+er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
 
 \begin{figure}[htbp]
     \centering
@@ -529,11 +531,18 @@ er knyttet sammen med en kant.
     \label{fig:two_graphs}
 \end{figure}
 
-Språket kalles \textsc{3-colour} og det har vært kjent i mer enn 50
-år det er i $\mathsf{NPC}$~\cite{Karp1972Reducibility,
-GareyJohnson1979}.  Det vil si at problemer som kan reduseres til
-\textsc{3-colour} er \emph{umulig} å løse.
+Det har vært kjent i mer enn 50 år at \textsc{3-colour} er i
+$\mathsf{NPC}$~\cite{Karp1972Reducibility, 
+GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
+språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
+annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
+\emph{umulig}.
 
+Et viktig bidrag i artikkelen er å vise at vi man bruke
+\textsc{3-colour} til å realisere en \textsc{Zero-Knowledle Protocol}.
+Resultatet forlenges til å vise at allt språk i $\mathsf{NP}$, og
+derfor alle språk i $\mathsf{NPC}$ kan brukes til å bygge en slik
+protokoll.
 
 
 \subsection{Kryptering}
@@ -552,7 +561,13 @@ nettopp er knyttet til programvare heller enn teori.
 
 Shannon~\cite{Shannon1949Communication} viste for et par generasjoner
 siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
-under antagelsen om ``ekte'' tilfeldighet er det eneste sikre.  I
+under antagelsen om ``ekte'' tilfeldighet er det eneste sikre; for å
+si det forsiktig er diskusjonen om ``ekte'' tilfeldighet ganske
+omfattende og vi lar det ligge.  Det er tilstrekkelig å vite at
+kryptering kan gjøres helt (!) vanntett om man ønsker\footnote{Ordet
+\emph{umulig} er gitt en annen betydning og kan derfor ikke brukes her.}.
+
+I
 praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
 er fra vår egen levetid og er at krypteringen er sikker i møte med
 enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
@@ -569,53 +584,112 @@ offentlig-nøkkel--kryptering hviler på svært mange antagelser legger
 vi slike løsninger bort uten mer om-og-men.  Det eneste kloke er å bruke
 delt-nøkkel kryptering til å sikre informasjon som brukes til å
 formidle kunnskap om hemmeligheter;
-Shannon~\cite{Shannon1949Communication} diskuterer utelukkende
-delf-nøkkel (av åpenbare grunner). 
 
-Som kjent er kvantedatamaskiner så kraftige at de trolig kan svare på
-spørsmål i språk utenfor $\mathsf{BPP}$; her ligger årsaken til at
-kvantemaskiner og kryptering ofte okkuperer plass i samme setning.  Vi
-sover likevel godt om natten vel vitende om at kryptografi som kan
-motstå kvante-maskiner er velkjente.
+Som kjent har kvantedatamaskineren annen beregningsmodell (ikke basert
+på Turing).  Det ser derfor ut til at de kan svare på spørsmål i språk
+utenfor $\mathsf{BPP}$; her ligger årsaken til at kvantemaskiner og
+kryptering ofte okkuperer plass i samme setning.  Vi sover likevel
+godt om natten vel vitende om at kryptografi som kan motstå
+kvante-maskiner er velkjente.
+
+Vi vil representere krypteringen av \AVal{X} som 
+
+\subsection{Protokoll basert på \textsc{3-colour}}
+
+Igjen er oppsettet at Bob ønsker å overbeivse Alice om at han kjenner
+en hemmelighet, uten å lekke informasjon.  Her er det fristende å
+foreslå ``Han kan bare sende hemmeligheten kryptert til Alice for å
+bevise det'', men målet er å heller ikke lekke informasjon til ham;
+det ville være katastrofe å sende hemmeligheten til feril mottaker;
+igjen, de som drømmer om at \textsc{Pki} løser utfordringene må sette
+seg inn i antagelsene.
+
+Denne gangen er hemmeligheten pakket inn somfargeleggingen av nodene i
+en graf; vi velger 3 farger uten tap av det generelle.
+
+% Her kommer sikkert AA og redder meg.
+\begin{ASteps}
+  \ASend*{B}{A}{}\\
+  \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
+  \ASend*{A}{B}{\AVar{M}}[3]
+\end{ASteps}
+
+Bob har publisert en graf $G=(VE)$ som han vet kan fargelegges;
+fargelkeggingen er hemmeligheten.  Alice ønsker å overbevise Bob om at
+hun kjenner hemmeligheten (fargeleggingen).  Fargeleggingen Bob har
+klaget kalles
+% Her mangler det notasjon: Alle nodene i V er tilordnet en verdi fra
+% settet {1,2,3}.  \in er neppe rett.
+$\phi: V \in \{1,2,3\}$
+%
+og viser hvilke noder som har hvilken farge.
+
+Protokollen har tre meldinger, og gjentas til Bob fornøyd; mer om hva
+det innebærer nedenfor.
+%
+\begin{enumerate}
+\item \Apri{A} genrerer en kopi av $G$ og randomiserer nodenavnene.
+  Det gir en annen (men strukturelt lik) fargelegging av nodene og
+  formelt er $\pi \in_R \Sym(\{1,2,3\})$ (som betyr at av settet av
+  alle permutasjoner av settet av farger (her 3) velges én).  A
+  genererer tilfeldige krypteringsnøkler $r_v$ og beregner
+  $R_v = krypt(\pi(\phi(v)), r_v)$ for alle $v \in V$.
+  A sender de kryptere meldingene $R_1, R_2, .... R_n$ til B;
+
+\item B velger en tilfeldig kant $e \in_R E$ og sender den til A.  Det
+  kan vi tenke på som at B ver A vise hun kjenner fargelegggingen av
+  de nodene som kanten knytter sammen.  Husk at $G$ er offentlig slik
+  at navnene på kantene er kjent, og
+
+\item Dersom $e = (u,v) \in E$ beviser A at hun kjenner fargene i
+  disse to nodene ved å sende til B $(\pi(\phi(u), r_u)$ og
+  $(\pi(\phi(v)), r_v)$ (innholdet i to i serien av krypterte
+  meldinger sendt i 0).
+\end{enumerate}
+
+Nå vil B verifisere at
+$R_u = krypt(\pi(\phi(u)), r_u)$,
+$R_v = krypt(\pi(\phi(v)), r_v)$,
+$\pi(\phi(u)) \not= \pi(\phi(v))$, og at
+$\pi\phi(u)), \pi((\phi(v)) \in {1,2,3}$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%% \subsection{Språkene i artikkelen}
 
+%% Bidraget i artikkelen er to språk \textsc{QR} og \textsc{QNR} som
+%% begge har egenskapen at Alice kan overbevise Bob at hun besitter en
+%% $x$ som er i språket, uten å avsløre $x$.
 
+%% Formelt er \textbf{QR} settet av alle heltall $(x,y)$ slik at $y$ er
+%% en kvadratisk rest, modulo $x$.  Kvadratisk rest betyr at det finnes
+%% et heltall $z$ slik at
+%% $$z^2 \equiv y \pmod x$$,
+%% eller med andre ord, at $z$ er kvadratroten til $y$.  Det antas at
+%% dersom $x$ er produktet av to primfaktorer, da er det ``vanskelig'' å
+%% finne $z$ gitt $y$.  ``Vanskelig'' betyr her at det er utenfor
+%% \textbf{BPP}.
 
-\subsection{Språkene i artikkelen}
+%% La $x=77$ ($7\times 11$).  Da er det langt fra enkelt å avgjøre om
+%% $y_1=31$ og/eller $y_2=37$ er kvadratisk rest i
+%% \textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2\equiv37 \pmod 77$ mens
+%% $31$ er ikke kvadratisk rest $\pmod 77$ (det vil si $\nexists z: z^2\equiv31 \pmod
+%% 77$).}.
 
-Bidraget i artikkelen er to språk \textsc{QR} og \textsc{QNR} som
-begge har egenskapen at Alice kan overbevise Bob at hun besitter en
-$x$ som er i språket, uten å avsløre $x$.
+%% Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
+%% slik $z$ ikke finnes.
 
-Formelt er \textbf{QR} settet av alle heltall $(x,y)$ slik at $y$ er
-en kvadratisk rest, modulo $x$.  Kvadratisk rest betyr at det finnes
-et heltall $z$ slik at
-$$z^2 \equiv y \pmod x$$,
-eller med andre ord, at $z$ er kvadratroten til $y$.  Det antas at
-dersom $x$ er produktet av to primfaktorer, da er det ``vanskelig'' å
-finne $z$ gitt $y$.  ``Vanskelig'' betyr her at det er utenfor
-\textbf{BPP}.
+%% Den mest effektive algoritmen er å faktorisere $x$.  Språket
+%% \textsc{Factor} er ikke \emph{umulig} men man kjenner heller ikke noen
+%% løsning i polynomisk tid.
 
-La $x=77$ ($7\times 11$).  Da er det langt fra enkelt å avgjøre om
-$y_1=31$ og/eller $y_2=37$ er kvadratisk rest i
-\textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2\equiv37 \pmod 77$ mens
-$31$ er ikke kvadratisk rest $\pmod 77$ (det vil si $\nexists z: z^2\equiv31 \pmod
-77$).}.
-
-Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
-slik $z$ ikke finnes.
-
-Den mest effektive algoritmen er å faktorisere $x$.  Språket
-\textsc{Factor} er ikke \emph{umulig} men man kjenner heller ikke noen
-løsning i polynomisk tid.
-
-Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
-\textsc{QNR} er fra artikkelen.}:
-\begin{equation}
-  QR = {(x,y) | y \textrm{er en kvadratisk rest $\pmod x$}} \\
-  QNR = {(x,y) | y \textrm{er kvadratisk prim $\pmod x$}} \\
-\end{equation}
+%% Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
+%% \textsc{QNR} er fra artikkelen.}:
+%% \begin{equation}
+%%   QR = {(x,y) | y \textrm{er en kvadratisk rest $\pmod x$}} \\
+%%   QNR = {(x,y) | y \textrm{er kvadratisk prim $\pmod x$}} \\
+%% \end{equation}
 
 
 
@@ -626,8 +700,4 @@ Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
 \bibliography{zero}
 
 \end{document}
-
-
-
-
 
