@@ -28,7 +28,7 @@ def generate_non_3_colorable_graph(num_nodes=15, edge_probability=0.4):
                 
     return G
 
-def plot_and_save_non_3_colorable(G, filename="G2.png"):
+def plot_and_save_non_3_colorable(G, filename="G4.png"):
     """
     Computes a greedy coloring (which will require >= 4 colors) and 
     saves the visualization as a PNG.

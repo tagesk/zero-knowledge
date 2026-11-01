@@ -23,7 +23,7 @@ def generate_3_colorable_graph(num_nodes=15, edge_probability=0.4):
                     
     return G, colors
 
-def plot_and_save_graph(G, colors, filename="G1.png"):
+def plot_and_save_graph(G, colors, filename="G3.png"):
     """
     Renders the graph using matplotlib, coloring nodes according to their 
     valid 3-coloring assignment, and saves it as a PNG.
