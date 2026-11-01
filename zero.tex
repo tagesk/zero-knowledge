@@ -110,7 +110,9 @@ for å snakke om antagelser.
 \section{Matematisk utgangspunkt}
 \label{sec:utgangspunkt}
 Den matematiske konteksten i artikkelen er språk og
-kompleksitetsklasser; vi gir derfor en kort oppfriskning.
+kompleksitetsklasser; vi gir derfor en kort oppfriskning.  Før vi
+kommer til artikkelens bidrag må vi introdusere to vekjente språk
+knyttet til grafer, og snakke litt om kryptering.
 
 \subsection{Språk}
 Alan Turing var den første til å representere (matematiske) spørsmål
@@ -345,46 +347,18 @@ Her noterer vi med en viss interesse at hverken RSA (basert på
 \textsc{Factor} eller ECDSA (basert på \textsc{DLG}) er \emph{umulig}
 å knekke.  Vanskelig, men ikke \emph{umulig}.
 
+
 %
 %
-\section{Problemstilling}
-
-På et strukturelt nivå ønsker vi at Charlie, som lytter på
-kommunikasjonen mellom Alice og Bob, er i samme beregningsmessige
-posisjon etter å ha lytteat på protokollen mellom Alice og Bob som han
-var før protokollen startet.  Altså at kompleksiteten i å finne $x$
-ikke endrer seg gjennom å lytte mens Bob på sin side blir overbevist
-om at Alice kjenner $x$.
-
-Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
-overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
-verdi om $x$.  Konkret:
-\begin{itemize}
-\item Dersom $x \in L$ da kan Alice overbevise Bob om det med en
-  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$, og
-\item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
-  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$.
-\end{itemize}
-Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
-sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
-gjennomføre flere runder).
-
 \subsection{Isomorfe grafer}
 
-Eksempelet med kortstokken vi seksjon~\ref{sec:bakgunn} illustrerte
-essensen.  For bruk mellom datamaskiner, og i særdeleshet for å
-formidle hemmeligheter, er det nødvendig med en noe mer komplisert
-omgivelse.
-
 To grafer $G_1, G_2$ er \emph{isomorfe} dersom de er ``like'' i sin
-struktur, men ikke nødvendigvis i navnet på noder og kanter.  Formelt
-er kravet en \emph{bijeksjon} mellom kantene
-
+struktur, men ikke nødvendigvis i navnet på noder og kanter.
 To grafer $G_1 = (V_1, E_1)$ og $G_2 = (V_2, E_2)$  er \emph{isomorfe}
 (vi skriver $G_1 \cong G_2$) dersom, og bare dersom, det finnes en
 \emph{bijeksjon} $$f: V_1 \to V_2$$
 slik at dersom to vilkårlige noder $u, v \in V_1$ er forbundet med en
-kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbindet med en
+kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbudet med en
 kant i $G_2$.
 
 Å generere en graf er lett, og det er enkelt å generere en isomorf
@@ -416,13 +390,13 @@ egenskapen litt senere.
     \caption{To grafer som er isomorfe.  Hele poenget er at det ikke
       er lett å se.  Mappingen her er 0:1, 1:2, 2:0, 3:4, 4:8, 5:5,
       6:9, 7:6, 8:3, 9:7.}
-    \label{fig:two_graphs}
+    \label{fig:to_grafer}
 \end{figure}
 
 Selve mappingen er en liste med navn (på noder, se
-Figur~\ref{fig:two_graphs}.  Den forteller ingenting om grafenes
+Figur~\ref{fig:to_grafer}.  Den forteller ingenting om grafenes
 struktur (som er det isomorfi handler om).  Særlig: Gitt en graf og en
-mapping kan man (kun) lære at det finnes en isimorf graf, men verdien
+mapping kan man (kun) lære at det finnes en isomorf graf, men verdien
 av den kunnskapen er null.
 
 Det er ikke er lett å avgjøre om to grafer er isomorfe, selv om det
@@ -433,6 +407,132 @@ $\mathsf{P} = \mathsf{NP}$.
 Gitt en mapping fra én graf til en annen er det trivielt å verifisere
 at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
 $\mathsf{NP}$.
+
+
+%
+%
+\subsection{Fargelegge en graf}
+
+Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
+$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
+at ingen noder med lik farge er forbundet med en kant?  Om vi velger
+$n=5$ er det klart at om én (ellere flere) noder har mer enn 5 kanter
+er svaret nei.  For å gjøre oppsettet så enkelt som muolig velger vi
+$n=3$. 
+
+La $\mathsf{L}$ være språket om holder alle grafer hvor det er mulig å
+farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
+er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{3_colorable_graph.png}
+        \caption{En graf riktig farvelagt}
+        \label{fig:farge-1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{3_NON_colorable_graph.png}
+        \caption{Kan ikke fargelegges med 3 farger}
+        \label{fig:farge-2}
+    \end{subfigure}
+    \caption{To grafer med tre og fire farger, respektive}
+    \label{fig:two_graphs}
+\end{figure}
+
+Det har vært kjent i mer enn 50 år at \textsc{3-colour} er i
+$\mathsf{NPC}$~\cite{Karp1972Reducibility, 
+GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
+språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
+annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
+\emph{umulig}.
+
+
+%
+%
+\subsection{Kryptering}
+
+Før vi kan gå vidre trenger vi å diskutere hvilke antagelser
+kryptering krever.  Det vanlige er å helt enkelt anta at
+\textsc{Factor} og/eller \textsc{DLG} ikke er i $\textsf{BPP}$.  Et
+viktig tema i dette notatet er å få grep om antagelser, og da er
+kryptering viktig.
+
+Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det som er
+mulig er å vise at et (sett) med problemer er i samme
+kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
+svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
+nettopp er knyttet til programvare heller enn teori.
+
+Shannon~\cite{Shannon1949Communication} viste for et par generasjoner
+siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
+under antagelsen om ``ekte'' tilfeldighet er det eneste sikre; for å
+si det forsiktig er diskusjonen om ``ekte'' tilfeldighet ganske
+omfattende og vi lar det ligge.  Det er tilstrekkelig å vite at
+kryptering kan gjøres helt (!) vanntett om man ønsker\footnote{Ordet
+\emph{umulig} er gitt en annen betydning og kan derfor ikke brukes her.}.
+
+I
+praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
+er fra vår egen levetid og er at krypteringen er sikker i møte med
+enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
+spørsmål i et språk som er med i
+$\mathsf{BPP}$~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
+det på, er at med mindre en kjent (og akseptert) antagelser--for
+eksempel $\mathsf{P} \not= \mathsf{NP}$--ikke lenger holder, så holder
+krypteringen (igjen, med forbehold om feil i programvare).
+
+Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{PKI} til å
+knytte entiteter som deltagere og kyrpteringsnøkler sammen gjennom
+kanaler~\cite{Lampson1992Authentication}.  Fordi
+offentlig-nøkkel--kryptering hviler på svært mange antagelser legger
+vi slike løsninger bort uten mer om-og-men.  Det eneste kloke er å bruke
+delt-nøkkel kryptering til å sikre informasjon som brukes til å
+formidle kunnskap om hemmeligheter;
+
+Som kjent har kvantedatamaskineren annen beregningsmodell (ikke basert
+på Turing).  Det ser derfor ut til at de kan svare på spørsmål i språk
+utenfor $\mathsf{BPP}$; her ligger årsaken til at kvantemaskiner og
+kryptering ofte okkuperer plass i samme setning.  Vi sover likevel
+godt om natten vel vitende om at kryptografi som kan motstå
+kvante-maskiner er velkjente.
+
+Vi vil representere krypteringen av \AVal{X} som 
+
+
+%
+%
+\section{Problemstilling}
+
+Eksempelet med kortstokken vi seksjon~\ref{sec:bakgrunn} illustrerte
+essensen i en \textsc{Zero Knowledge-Protocol}.
+For bruk mellom datamaskiner hvor det å sette seg ned ved bordet ikke
+er aktuelt, og i særdeleshet for å formidle hemmeligheter, er det
+nødvendig med en noe mer komplisert omgivelse
+
+På et strukturelt nivå ønsker vi at Charlie, som lytter på
+kommunikasjonen mellom Alice og Bob, er i samme beregningsmessige
+posisjon etter å ha lytteat på protokollen mellom Alice og Bob som han
+var før protokollen startet.  Altså at kompleksiteten i å finne $x$
+ikke endrer seg gjennom å lytte mens Bob på sin side blir overbevist
+om at Alice kjenner $x$.
+
+Vi ønsker å finne et språk \textsc{L} som er slik at Alice kan
+overbevise Bob om at hun kjenner $x \in L$ uten å formidle noe av
+verdi om $x$.  Konkret:
+\begin{itemize}
+\item Dersom $x \in L$ da kan Alice overbevise Bob om det med en
+  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$, og
+\item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
+  sannsynlighet $P > 1-{\|x\|}^c$ for enhver $c>0$.
+\end{itemize}
+Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
+sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
+gjennomføre flere runder).
+
 
 Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kuenner
 en hemmelighet, det vil si mappingen mellom to isomorfe grafer, uten å
@@ -499,44 +599,6 @@ det sammen om rundene kjører i parallell; det åpner svært utfordrende
 analytiske arenaer man kan danse på, men vi går ikke nærmere inn på.
 det her.
 
-\subsection{Fargelegge en graf}
-
-Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
-$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
-at ingen noder med lik farge er forbundet med en kant?  Om vi velger
-$n=5$ er det klart at om én (ellere flere) noder har mer enn 5 kanter
-er svaret nei.  For å gjøre oppsettet så enkelt som muolig velger vi
-$n=3$. 
-
-La $\mathsf{L}$ være språket om holder alle grafer hvor det er mulig å
-farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
-er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{3_colorable_graph.png}
-        \caption{En graf riktig farvelagt}
-        \label{fig:farge-1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.48\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{3_NON_colorable_graph.png}
-        \caption{Kan ikke fargelegges med 3 farger}
-        \label{fig:farge-2}
-    \end{subfigure}
-    \caption{To grafer med tre og fire farger, respektive}
-    \label{fig:two_graphs}
-\end{figure}
-
-Det har vært kjent i mer enn 50 år at \textsc{3-colour} er i
-$\mathsf{NPC}$~\cite{Karp1972Reducibility, 
-GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
-språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
-annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
-\emph{umulig}.
 
 Et viktig bidrag i artikkelen er å vise at vi man bruke
 \textsc{3-colour} til å realisere en \textsc{Zero-Knowledle Protocol}.
@@ -544,55 +606,6 @@ Resultatet forlenges til å vise at allt språk i $\mathsf{NP}$, og
 derfor alle språk i $\mathsf{NPC}$ kan brukes til å bygge en slik
 protokoll.
 
-
-\subsection{Kryptering}
-
-Før vi kan gå vidre trenger vi å diskutere hvilke antagelser
-kryptering krever.  Det vanlige er å helt enkelt anta at
-\textsc{Factor} og/eller \textsc{DLG} ikke er i $\textsf{BPP}$.  Et
-viktig tema i dette notatet er å få grep om antagelser, og da er
-kryptering viktig.
-
-Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det som er
-mulig er å vise at et (sett) med problemer er i samme
-kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
-svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
-nettopp er knyttet til programvare heller enn teori.
-
-Shannon~\cite{Shannon1949Communication} viste for et par generasjoner
-siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
-under antagelsen om ``ekte'' tilfeldighet er det eneste sikre; for å
-si det forsiktig er diskusjonen om ``ekte'' tilfeldighet ganske
-omfattende og vi lar det ligge.  Det er tilstrekkelig å vite at
-kryptering kan gjøres helt (!) vanntett om man ønsker\footnote{Ordet
-\emph{umulig} er gitt en annen betydning og kan derfor ikke brukes her.}.
-
-I
-praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
-er fra vår egen levetid og er at krypteringen er sikker i møte med
-enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
-spørsmål i et språk som er med i
-$\mathsf{BPP}$~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
-det på, er at med mindre en kjent (og akseptert) antagelser--for
-eksempel $\mathsf{P} \not= \mathsf{NP}$--ikke lenger holder, så holder
-krypteringen (igjen, med forbehold om feil i programvare).
-
-Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{PKI} til å
-knytte entiteter som deltagere og kyrpteringsnøkler sammen gjennom
-kanaler~\cite{Lampson1992Authentication}.  Fordi
-offentlig-nøkkel--kryptering hviler på svært mange antagelser legger
-vi slike løsninger bort uten mer om-og-men.  Det eneste kloke er å bruke
-delt-nøkkel kryptering til å sikre informasjon som brukes til å
-formidle kunnskap om hemmeligheter;
-
-Som kjent har kvantedatamaskineren annen beregningsmodell (ikke basert
-på Turing).  Det ser derfor ut til at de kan svare på spørsmål i språk
-utenfor $\mathsf{BPP}$; her ligger årsaken til at kvantemaskiner og
-kryptering ofte okkuperer plass i samme setning.  Vi sover likevel
-godt om natten vel vitende om at kryptografi som kan motstå
-kvante-maskiner er velkjente.
-
-Vi vil representere krypteringen av \AVal{X} som 
 
 \subsection{Protokoll basert på \textsc{3-colour}}
 
@@ -653,43 +666,15 @@ $R_v = krypt(\pi(\phi(v)), r_v)$,
 $\pi(\phi(u)) \not= \pi(\phi(v))$, og at
 $\pi\phi(u)), \pi((\phi(v)) \in {1,2,3}$.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Når \APri{A} skal svare på \APri{B}s spørsmål om fargene på to noder,
+hun $p=1/3$ sannsynlighet for å gjette rett på hver.  Hun har derfor
+bare $p=1/9$ for å gjette rett på begge.  For hver runde øker
+\APri{B}s tillit til at \APri{A} kjenner hemmeligheten tilsvarende.
+Fordi \APri{A} genererer en ny permutasjon av $G$ for hver runde
+lekker ingen informasjon om farveleggingnen.  Det betyr at 
+\APri{B} kan be om så mange runder som ønskelig for å få
+tilfredsstillende sikkerhet.
 
-
-%% \subsection{Språkene i artikkelen}
-
-%% Bidraget i artikkelen er to språk \textsc{QR} og \textsc{QNR} som
-%% begge har egenskapen at Alice kan overbevise Bob at hun besitter en
-%% $x$ som er i språket, uten å avsløre $x$.
-
-%% Formelt er \textbf{QR} settet av alle heltall $(x,y)$ slik at $y$ er
-%% en kvadratisk rest, modulo $x$.  Kvadratisk rest betyr at det finnes
-%% et heltall $z$ slik at
-%% $$z^2 \equiv y \pmod x$$,
-%% eller med andre ord, at $z$ er kvadratroten til $y$.  Det antas at
-%% dersom $x$ er produktet av to primfaktorer, da er det ``vanskelig'' å
-%% finne $z$ gitt $y$.  ``Vanskelig'' betyr her at det er utenfor
-%% \textbf{BPP}.
-
-%% La $x=77$ ($7\times 11$).  Da er det langt fra enkelt å avgjøre om
-%% $y_1=31$ og/eller $y_2=37$ er kvadratisk rest i
-%% \textbf{QR}.\footnote{$24^2, 31^2, 46^2$, og $53^2\equiv37 \pmod 77$ mens
-%% $31$ er ikke kvadratisk rest $\pmod 77$ (det vil si $\nexists z: z^2\equiv31 \pmod
-%% 77$).}.
-
-%% Tilsvarende sier vi at $y$ er \emph{kvadratisk prim} med $x$ dersom en
-%% slik $z$ ikke finnes.
-
-%% Den mest effektive algoritmen er å faktorisere $x$.  Språket
-%% \textsc{Factor} er ikke \emph{umulig} men man kjenner heller ikke noen
-%% løsning i polynomisk tid.
-
-%% Vi kan nå deinere to språk\footnote{Navnene \textsc{QR} og
-%% \textsc{QNR} er fra artikkelen.}:
-%% \begin{equation}
-%%   QR = {(x,y) | y \textrm{er en kvadratisk rest $\pmod x$}} \\
-%%   QNR = {(x,y) | y \textrm{er kvadratisk prim $\pmod x$}} \\
-%% \end{equation}
 
 
 
