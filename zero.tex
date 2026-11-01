@@ -15,8 +15,10 @@
 \newtheorem{definition}{Definisjon}[section] % Numbered by section (e.g., Definition 2.1)
 
 \usepackage[T1]{fontenc}
-\usepackage{XCharter}         % Modern, feature-rich version of Bitstream Charter for text
-%\usepackage[eulervm]{eulervm} % Euler math fonts configured to match text weight
+\usepackage{XCharter}         
+
+% Euler math fonts configured to match text weight
+%\usepackage[eulervm]{eulervm}
 % For å få dem inn:
 % sudo apt install texlive-fonts-extra
 
@@ -350,26 +352,6 @@ Her noterer vi med en viss interesse at hverken RSA (basert på
 %
 \subsection{Isomorfe grafer}
 
-To grafer $G_1, G_2$ er \emph{isomorfe} dersom de er ``like'' i sin
-struktur, men ikke nødvendigvis i navnet på noder og kanter.
-To grafer $G_1 = (V_1, E_1)$ og $G_2 = (V_2, E_2)$  er \emph{isomorfe}
-(vi skriver $G_1 \cong G_2$) dersom, og bare dersom, det finnes en
-\emph{bijeksjon} $$f: V_1 \to V_2$$
-slik at dersom to vilkårlige noder $u, v \in V_1$ er forbundet med en
-kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbudet med en
-kant i $G_2$.
-
-Å generere en graf er lett, og det er enkelt å generere en isomorf
-kopi av en graf.  Det er i praksis ``bare'' å flytte rundt på det som
-identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
-navn.
-Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
-som viser hvordan identifikatorene på nodene er knyttet til hverandre.
-Listen er naturligvis like lang som det er noder i grafen.  En slik
-mapping kan brukes begge veier, og i flere ledd; én graf brukes til å
-generere en ny, som brukes\ldots  Vi skal komme tilbake til denne
-egenskapen litt senere.
-
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
@@ -391,17 +373,36 @@ egenskapen litt senere.
     \label{fig:to_grafer}
 \end{figure}
 
+To grafer $G_1 = (V_1, E_1)$ og $G_2 = (V_2, E_2)$  er \emph{isomorfe}
+(vi skriver $G_1 \cong G_2$) dersom, og bare dersom, det finnes en
+\emph{bijeksjon} $$f: V_1 \to V_2$$
+slik at dersom to vilkårlige noder $u, v \in V_1$ er forbundet med en
+kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbudet med en
+kant i $G_2$.
+I praksis betyr det at grafere har lik struktur, selv om navnet på
+noder og kanten er forskjellig.
+
+Å generere en graf er lett, og det er enkelt å generere en isomorf
+kopi av en graf.  Det er i praksis ``bare'' å flytte rundt på det som
+identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
+navn.
+Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
+som viser hvordan identifikatorene på nodene er knyttet til hverandre.
+Listen er naturligvis like lang som det er noder i grafen.  En slik
+mapping kan brukes begge veier, og i flere ledd; én graf brukes til å
+generere en ny, som brukes\ldots  Vi skal komme tilbake til denne
+egenskapen litt senere.
+
 Selve mappingen er en liste med navn (på noder, se
-Figur~\ref{fig:to_grafer}.  Den forteller ingenting om grafenes
+Figur~\ref{fig:to_grafer}).  Den forteller ingenting om grafenes
 struktur (som er det isomorfi handler om).  Særlig: Gitt en graf og en
 mapping kan man (kun) lære at det finnes en isomorf graf, men verdien
-av den kunnskapen er null.
+av den kunnskapen er null ettersom det for alle grafer kan lages en
+
 
 Det er ikke er lett å avgjøre om to grafer er isomorfe, selv om det
-ikke er \emph{umulig}.  Språket \textsc{Grafisomorfisme} er ikke i
-$\mathcal{P}$, heller ikke i $\mathcal{NPC}$, men sitter trolig ``i midten''
-(sammen med \textsc{Factor}); det hele avhenger av om
-$\mathcal{P} = \mathcal{NP}$.
+ikke er \emph{umulig}.  Så vidt man vet er språket
+\textsc{Grafisomorfisme}  ikke i $\mathcal{P}$.
 Gitt en mapping fra én graf til en annen er det trivielt å verifisere
 at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
 $\mathcal{NP}$.
@@ -411,29 +412,18 @@ $\mathcal{NP}$.
 %
 \subsection{Fargelegge en graf}
 
-Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
-$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
-at ingen noder med lik farge er forbundet med en kant?  Om vi velger
-$n=5$ er det klart at om én (ellere flere) noder har mer enn 5 kanter
-er svaret nei.  For å gjøre oppsettet så enkelt som muolig velger vi
-$n=3$. 
-
-La $\mathcal{L}$ være språket om holder alle grafer hvor det er mulig å
-farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
-er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
-
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{3_colorable_graph.png}
+        \includegraphics[width=\textwidth]{G3.png}
         \caption{En graf riktig farvelagt}
         \label{fig:farge-1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{3_NON_colorable_graph.png}
+        \includegraphics[width=\textwidth]{G4.png}
         \caption{Kan ikke fargelegges med 3 farger}
         \label{fig:farge-2}
     \end{subfigure}
@@ -441,33 +431,45 @@ er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
     \label{fig:two_graphs}
 \end{figure}
 
-Det har vært kjent i mer enn 50 år at \textsc{3-colour} er i
-$\mathcal{NPC}$~\cite{Karp1972Reducibility, 
+Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
+$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
+at ingen noder med lik farge er forbundet med en kant?
+For å gjøre oppsettet så enkelt som mulig velger vi  $n=3$.  Det er da
+åpenbart at en graf hvor det finnes noder med mer enn tre kanter, så
+er svaret nei.
+
+La $\mathcal{L}$ være språket om holder alle grafer hvor det er mulig å
+farvelegge nodene med $n=3$ farger uten at noen noder med lik farge
+er knyttet sammen med en kant; språket kalles \textsc{3-colour}.
+
+Det har vært kjent i mer enn 50 år at å avgjøre om en graf er med i
+\textsc{3-colour} er i $\mathcal{NPC}$~\cite{Karp1972Reducibility, 
 GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
 språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
 annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
-\emph{umulig}.
+\emph{umulig}; dette skal vi bruke senere.
 
 
 %
 %
 \subsection{Kryptering}
 
-Før vi kan gå vidre trenger vi å diskutere hvilke antagelser
+Før vi kan gå videre trenger vi å diskutere hvilke antagelser
 kryptering krever.  Det vanlige er å helt enkelt anta at
-\textsc{Factor} og/eller \textsc{DLG} ikke er i $\textsf{BPP}$.  Et
+\textsc{Factor} og/eller \textsc{DLG}\footnote{Discrete Logarithm
+Problem} ikke er i $\textsf{BPP}$.  Et 
 viktig tema i dette notatet er å få grep om antagelser, og da er
 kryptering viktig.
 
-Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det som er
-mulig er å vise at et (sett) med problemer er i samme
+Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det vi kan
+gjøre er å vise at problemer er i samme
 kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
 svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
 nettopp er knyttet til programvare heller enn teori.
 
-Shannon~\cite{Shannon1949Communication} viste for et par generasjoner
+Shannon~\cite{Shannon1949Communication} skrev for et par generasjoner
 siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
-under antagelsen om ``ekte'' tilfeldighet er det eneste sikre; for å
+under antagelsen om ``ekte'' tilfeldighet er sikkert; for å
 si det forsiktig er diskusjonen om ``ekte'' tilfeldighet ganske
 omfattende og vi lar det ligge.  Det er tilstrekkelig å vite at
 kryptering kan gjøres helt (!) vanntett om man ønsker\footnote{Ordet
@@ -483,22 +485,22 @@ det på, er at med mindre en kjent (og akseptert) antagelser--for
 eksempel $\mathcal{P} \not= \mathcal{NP}$--ikke lenger holder, så holder
 krypteringen (igjen, med forbehold om feil i programvare).
 
-Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{PKI} til å
-knytte entiteter som deltagere og kyrpteringsnøkler sammen gjennom
-kanaler~\cite{Lampson1992Authentication}.  Fordi
-offentlig-nøkkel--kryptering hviler på svært mange antagelser legger
-vi slike løsninger bort uten mer om-og-men.  Det eneste kloke er å bruke
+Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{Pki} for å
+knytte entiteter som deltagere og kanaler (krypteringsnøkler)
+sammen~\cite{Lampson1992Authentication}.  Fordi
+offentlig-nøkkel kryptografi hviler på alt for mange antagelser legger
+vi slike løsninger bort uten noe om-og-men.  Det eneste kloke er å bruke
 delt-nøkkel kryptering til å sikre informasjon som brukes til å
-formidle kunnskap om hemmeligheter;
+formidle kunnskap om hemmeligheter.
 
-Som kjent har kvantedatamaskineren annen beregningsmodell (ikke basert
-på Turing).  Det ser derfor ut til at de kan svare på spørsmål i språk
-utenfor $\mathcal{BPP}$; her ligger årsaken til at kvantemaskiner og
-kryptering ofte okkuperer plass i samme setning.  Vi sover likevel
-godt om natten vel vitende om at kryptografi som kan motstå
-kvante-maskiner er velkjente.
-
-Vi vil representere krypteringen av \AVal{X} som 
+Som kjent har kvantedatamaskineren annen beregningsmodell enn det
+definisjonen av $\mathcal{P}$ og $\mathcal{NP}$ bygger på.  Det ser
+derfor ut til at de kan svare på spørsmål i språk utenfor
+$\mathcal{BPP}$ i polynomisk tid.  Her ligger årsaken til at
+kvantemaskiner og kryptering ofte okkuperer plass i samme setning.  Vi
+sover likevel godt om natten vel vitende om at kryptografi som kan
+motstå kvante-maskiner er velkjente.  Rykter forteller
+at~\cite{stinson2026primer} er en god introduksjon.
 
 
 %
@@ -507,8 +509,8 @@ Vi vil representere krypteringen av \AVal{X} som
 
 Eksempelet med kortstokken vi seksjon~\ref{sec:bakgrunn} illustrerte
 essensen i en \textsc{Zero Knowledge-Protocol}.
-For bruk mellom datamaskiner hvor det å sette seg ned ved bordet ikke
-er aktuelt, og i særdeleshet for å formidle hemmeligheter, er det
+For bruk mellom datamaskiner hvor det ikke er aktuelt å sette seg ned
+ved bordet, og i særdeleshet for å formidle hemmeligheter, er det
 nødvendig med en noe mer komplisert omgivelse
 
 På et strukturelt nivå ønsker vi at Charlie, som lytter på
@@ -527,10 +529,12 @@ verdi om $x$.  Konkret:
 \item Dersom $x \not\in L$ da vil Bob kunne avvise at $x \in L$ med en 
   sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$.
 \end{itemize}
-Med samme begrunnelsen som vi gav over knyttes det vi ønsker til en 
-sannsynlighet vi kan gjøre så liten vi ønsker (i praksis gjennom å
-gjennomføre flere runder).
 
+Vi kan senke sannsynligheten for at noen gjetter våre
+krypteringsnøkler ved å velge dem lange; vi husker at ``senke'' ikke
+medfører ``sette til 0''.  På sammen måte kan Bob senke
+sannsynligheten for at Alice lurer ham til et nivå han kan leve med.
+Motto er ``Tenk på et lite (nok) tall''.
 
 
 \subsection{Protokoll basert på isomorfi}
@@ -538,9 +542,11 @@ gjennomføre flere runder).
 Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kjenner
 en hemmelighet basert på mappingen mellom to isomorfe grafer, uten å
 avsløre noe om grafene.  Det vil si: en \textsc{Zero-Knowledge
-Protocol}. 
+Protocol}.  Protokollens evne til å senke sannsynligheten henger
+på at \textsc{Grafisomorfi} ikke er i $\mathcal{P}$.
 
-Grafene $G_1$ og $G_2$ er offentlige, formodentlig produsert av Bob.
+Grafene $G_1$ og $G_2$ er offentlige, formodentlig produsert av
+\APri{B}.
 Han har først generert $G_1$ og fra den laget en kopi, med andre
 identifikatorer på nodene.  Fordi han har laget de to grafene, kjenner
 han mappingen mellom nodene.
