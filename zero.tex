@@ -49,7 +49,7 @@ refererer til~\cite{Goldwasser1989Knowledge}.  Der det er nødvendig å
 referere til denne teksten bruker vi eksplisitt ``i dette notatet''.
 
 Det gjøres ingen antagelser om kanaler som meldinger sendes på, utover
-ordning i tid (en melding ankommer ikke føær den er sendt).  I
+ordning i tid (en melding ankommer ikke før den er sendt).  I
 særdeleshet antas det ikke at kanaler tilbyr konfidensialitet. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,44 +62,46 @@ kjenner hemmeligheten) som lytter på samtalen.  Det er en fordel om
 Charlie heller ikke kan konkludere at Alice kjenner hemmeligheten ut
 fra kommunikasjonen.
 
-For eksempel: Gitt at Alice har konfidensielle data, for eksempel
-et dokument; la oss kalle dokumentet for $D$.  Hun tilbyr ett eller
+For eksempel: Gitt at Bob har konfidensielle data, for eksempel
+et dokument, et passord, eller noe tilsvarende; la oss kalle
+dokumentet for $D$.  Han tilbyr ett eller 
 annet til andre som også har dokumentet, for eksempel en form for
-login.  Bob mener han har det, og ønkser å bevise det til Alice.  Når
-følgende protokoll er ferdig er \APri{A} overbevist om at \APri{B}
+login.  Alice mener hun har det, og ønkser å bevise det for Bob.  Når
+følgende protokoll er ferdig er \APri{B} overbevist om at \APri{A}
 også har (tilgang til) $D$: 
 
 \begin{ASteps*}
-  \ASend{B}{A}{\AStr{Kan jeg få adgang?}} \\
-  \ASend{A}{B}{\ANonce{A}} \\
-  \ASend{B}{A}{\AAssign{\AVar{x}}{\AChash{\ANonce{A} \AConcat \AVal{D}}}}
+  \ASend{A}{B}{\AStr{Kan jeg få adgang?}} \\
+  \ASend{B}{A}{\ANonce{B}} \\
+  \ASend{A}{B}{\AAssign{\AVar{x}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}}
 \end{ASteps*}
 %
 hvor notasjonen \AConcat betyr sammensetting
-(\textit{concatination}), \ANonce{A} ``et tilstrekkelig stort
+(\textit{concatination}), \ANonce{B} ``et tilstrekkelig stort
 tilfeldig tall'' (la oss si $\approx2^{256}$), og \AChash{m} et
-digitalit fingeravtrykk (\textit{hashing}) av \AVal{m}.  \APri{A}
-beregner selv \AAssign{\AVar{y}}{\AChash{\ANonce{A} \AConcat \AVal{D}}}.
-Dersom \AVar{x}=\AVar{y} kan \APri{A} konkludere at \APri{B} kjenner
+digitalit fingeravtrykk (\textit{hashing}) av \AVal{m}.  \APri{B}
+beregner selv \AAssign{\AVar{y}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}.
+Dersom \AVar{x}=\AVar{y} kan \APri{B} konkludere at \APri{A} kjenner
 (eller har tilgang til) \AVal{D}.  Vi noterer i
 margen at denne enkle protokollen har mange svakheter og ikke
 tilfredsstiller moderne krav til å være sikker.
 
-Fordi han lytter på all kommunikasjon kjenner Charlie nå \ANonce{A}
-og \AChash{\ANonce{A} \AConcat \AVal{D}}.  Det vil si at om han har
+Fordi han lytter på all kommunikasjon kjenner Charlie nå \ANonce{B}
+og \AChash{\ANonce{B} \AConcat \AVal{D}}.  Det vil si at om han har
 stjålet et dokument \AVal{D'} kan han undersøke om \AVal{D'}=\AVal{D}
 ved å beregne
-{\AAssign{\AVar{r}}{\AChash{\ANonce{A} \AConcat \AVal{D'}}}}
+{\AAssign{\AVar{r}}{\AChash{\ANonce{B} \AConcat \AVal{D'}}}}
 og
-{\AAssign{\AVar{s}}{\AChash{\ANonce{A} \AConcat \AVal{D}}}}.  Dersom
+{\AAssign{\AVar{s}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}}.  Dersom
 \AVar{r} = \AVar{s} kan \APri{C} konkludere at \AVal{D'}=\AVal{D} med
-samme sikkerhet som \APri{A}.
-Det vil at protokollen mellom
+samme sikkerhet som \APri{B}.
+Det vil si at protokollen mellom
 $\APri{A}$ og $\APri{B}$ lakk (meta)informasjon til Charlie.
 
 Evnen til å kunne verifisere om \AVal{D'}=\AVal{D} (når \AVal{D} er
 ment å være hemmelig)  er en betydelig fordel som
-kan gi næring til mange typer angrep.  \textit{Zero Knowledge} handler
+kan gi næring til mange typer angrep.  \textsc{Zero-Knowledge
+  Protocol} handler 
 om å overbevise den andre om noe, uten å lekke informasjon.  For å
 illustrere hva som menes, la Alice og Bob sitte på hver sin side av
 bordet, med en kortstokk mellom seg.  Alice trekker et kort, og ser på
@@ -157,7 +159,7 @@ skrives ut blir resultatet igjen en streng (av $0$ og $1$).  Lengden
 på dette problemet er naturligvis produktet av dimensjonene.
 
 Det finnes mer kompakte måter å gjøre det på, men i praksis spiller
-det ingen rolle.  Konstant-leddet som en slik konvertering utgjør blir
+det ingen rolle.  Konstant-leddet i en slik konvertering blir
 i praksis uten betydning.
 
 Når vi bruker strenger til å representere problemer på denne måten kan
@@ -183,8 +185,8 @@ Noen velkjente språk er:
   og settet med tall hvor svaret er ``ja''.
   Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
   tilhører ikke alle tall språket \textsc{Primes}
-\item [\textsc{Factor}]  Gitt to tall $n$ og $k$, finnes det et tall
-  $d \leq k$ som deler $n$, og
+\item [\textsc{Factor}]  Gitt to tall $n,k\in\mathbb{N}$, finnes det
+  et tall  $d \leq k$ som deler $n$, og
 \item [\textsc{Clique}] er spørsmålet om en graf inneholder en komplett
   sub-graf (klikk) med en gitt størrslse, sammen med problemene som
   representerer grafer hvor svaret er ``ja''.
@@ -204,7 +206,7 @@ Det essensielle er at alle spørsmål i et språk er ``like''.  For
 eksempel er faktorisering av store tall som er produktet av kun to
 primfaktorer lik for alle tall av lik størrelse.  Det vil si at vi kan
 bygge en løsning rundt faktorisering uten på forhånd velge hvilke tall
-som skal inngå.  Det gjør at hver instans er ``frisk'' og med samme
+som skal inngå.  Hver instans er ``frisk'' og med samme
 egenskaper som alle andre.
 
 
@@ -221,7 +223,7 @@ skal legges sammen.
 Multiplikasjon krever at vi ganger hvert siffer i tallene med
 de andre, og summerer resultatene til slutt.  Mest arbeid er det når
 tallene er like lange.  Kompleksiteten i multiplikasjon er derfor
-${N}^2$ hvor $N$ her ikke er tallene men summen av lengden.
+${N}^2$ hvor $N$ her ikke er tallene men lengden.
 
 Addisjonen vi gjør  til slutt blir fort neglisjerbar i forhold til
 selve multiplikasjonen fordi arbeidsmengden vokser mye raskere.  En
@@ -240,7 +242,7 @@ derfor ingenting spart.  Derfor, når kompleksiteten er, for eksempel,
 $\mathcal{O}(N^2)$ er det enten i tid eller i rom.
 
 For en introduksjon til aymptotisk vekst anbefaler
-vi~\cite{graham1994concrete} eller, naturligvis~\cite{knuth1997art1}.
+vi~\cite{graham1994concrete} eller, naturligvisk~\cite{knuth1997art1}.
 
 
 \subsubsection{Klassen P}
@@ -273,7 +275,7 @@ språk måler vi $N$ som lengden.  Et tall som er dobbelt så
 \emph{langt} som et annet, for eksempel 20 mot 10 siffer, det er svært
 mye større.  Denne algoritmen gir derfor eksponensiell vekst i antall
 operasjoner (målt mot $N$ som er lengden av $n$).
-Heldigvsi finnes det mer effektive algoritmer; det beste vi kjenner er
+Heldigvis finnes det mer effektive algoritmer; det beste vi kjenner er
 $\mathcal{O}({\log}^6 n)$\cite{Agrawal2004}.  Det er avgjørende her å se
 at å avgjøre om et tall er prim eller ei er noe annet og mye lettere
 enn å faktisk finne primfaktorene.  Språket \textsc{Primes} er derfor
@@ -330,15 +332,17 @@ ikke nødvendigvis at beviset er ``lett'' å finne).
 %
 %
 \subsubsection{Klassen \textsf{NPC}}
-Noen problemer som har enkel bevis, er svært vanskelig å løse.  For eksempel
+Noen problemer som har et enkel bevis, men beviset er svært vanskelig
+å finne.  For eksempel:
 \begin{itemize}
 \item \textsc{Travelling salesman}: Gitt en graf med vektede kanter,
   finnes det en rute med lengde $<k$ som besøker alle noder (byer)?
   Beviset er ruten, som er lett å verifisere har lengde mindre enn
   $k$;
-\item \textsc{Sekkeproblemet}: Gitt et sett av gjenstander med volum og
-  verdi, finnes det et subsett av gjenstandene som til sammen har verdi
-  $>k$ og som til sammen ikke har større volum en sekken?, og
+\item \textsc{Sekkeproblemet}: Gitt en sekk med et gitt volum og et
+  sett av gjenstander med volum og verdi, finnes det et subsett av
+  gjenstandene som til sammen har verdi $>k$ og som til sammen ikke
+  har større volum en sekken?, og 
 \item \textsc{Fargelegge en graf}: Gitt en graf hvor kantene ikke
     har retning, og et antall farger, finnes det en måte fargelegge
     nodene slik at ingen node har kant til en annen node med samme farge?
@@ -353,9 +357,10 @@ matematikere i flere tiår.  Det er ingen tegn på at noen av dem har
 enkle løsninger.
 
 \begin{definition}[Umulig]
-  Noe er \emph{umulig} dersom det er like vanskelig, eller vanskeligere, enn
-  problemene i $\textsf{NPC}$.
+  Noe er \emph{umulig} dersom det er like vanskelig, eller
+  vanskeligere, enn å finne bevis til problemene i $\textsf{NPC}$.
 \end{definition}
+%
 Denne definisjonen er naturligvis en svært uformell måte å uttrykke
 hvor mange beregninger som i det generelle tilfelle er nødvendig for å
 avgjøre om en streng $x \in L$, hvor $L \in \textsf{NPC}$.
@@ -407,7 +412,7 @@ Det ene i \textsf{NP} men utenfor \textsf{BPP} det andre i \textsf{NPC}.
 
 To grafer $G_1 = (V_1, E_1)$ og $G_2 = (V_2, E_2)$  er \emph{isomorfe}
 (vi skriver $G_1 \cong G_2$) dersom, og bare dersom, det finnes en
-\emph{bijeksjon} $$f: V_1 \to V_2$$
+\emph{bijeksjon} $f: V_1 \to V_2$, 
 slik at dersom to vilkårlige noder $u, v \in V_1$ er forbundet med en
 kant i $G_1$ da er deres avbildinger $f(u)$ og $f(v)$ forbudet med en
 kant i $G_2$.
@@ -742,13 +747,26 @@ tilfredsstillende sikkerhet.
 Artikkelen viser at \textsc{3-colour} kan brukes til å realisere en
 \textsc{Zero-Knowledle Protocol}.  Fordi de kan reduseres til
 hverandre, kan alle de andre problemene i \textsf{NPC} kan brukes
-til å bygge en slik protokoll.
+til å bygge en slik protokoll.  Kostnadene vil være polynomisk i
+lengden på problemet.  Videre, samme argument holder for hele
+\textsf{NP}. 
 
+Artikkelen identifiserer dermed en ny kompleksitetsklasse:
+\textsf{IP}.  Et språk $L$ er i \textsf{IP} dersom det finnes en
+protokoll som gjør et to krav er oppfylt:
+\begin{description}
+\item [Komplett:] Om $x \in L$ da kan Bob overbevise Alice, og
+\item [Trygg:] Om $x \not\in L$ da er det \emph{umulig} for Bob å
+  overbevise   Alice.
+\end{description}
 
+Satt sammen betyr det at:
+\begin{equation*}
+\textsf{P}\subseteq \textsf{NP}\subseteq \textsf{IP}=\textsf{PSPACE}  
+\end{equation*}
+Mankan finne dobbelt så mye som man ønsker å vite om denne relasjonen
+i \cite[kapittel 12.2]{papadimitriou1994computational}.
 
-
-%%%%%%%%%%%%%%%%%%%%
-\section{Notasjon}
 
 \bibliographystyle{plain}
 \bibliography{zero}
