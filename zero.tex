@@ -1,5 +1,5 @@
 % -*-mode: LaTeX; coding: utf-8; -*-
-\documentclass[a4paper]{scrartcl}
+\documentclass[a4paper, parskip=half]{scrartcl}
 \usepackage[top=3cm, bottom=3cm]{geometry}
 
 % For vakker crypto.  Dokumentasjonen ligger i katalogen
@@ -10,8 +10,6 @@
 \usepackage{subcaption}
 \usepackage{amssymb}
 \usepackage{amsthm}
-% Jeg liker ikke innrykk som start på avsnitt
-%\usepackage{parskip}
 
 % liker ikke høyrew-justerte marger
 \usepackage[document]{ragged2e}
@@ -45,12 +43,17 @@ Dette tekniske notatet gir en oversikt over en publisert
 artikkel~\cite{Goldwasser1985Knowledge,Goldwasser1989Knowledge}.
 Fordi dette notatet beskriver en artikkel er her ingen nye resultater.
 Termer som ``artikkelen'', ``kapittel 2'', ``figur 2'', og tilsvarende
-refererer til~\cite{Goldwasser1989Knowledge}.  Der det er nødvendig å
+refererer til~\cite{Goldwasser1985Knowledge}.  Der det er nødvendig å
 referere til denne teksten bruker vi eksplisitt ``i dette notatet''.
+
+Vi har hatt utgangspunkt i~\cite{Goldwasser1985Knowledge} heller
+enn~\cite{Goldwasser1989Knowledge} fordi den er mindre omfattende men
+likevel dekker det sentrale begrepet \textsc{Zero-Knowledge Protocol}.
 
 Det gjøres ingen antagelser om kanaler som meldinger sendes på, utover
 ordning i tid (en melding ankommer ikke før den er sendt).  I
-særdeleshet antas det ikke at kanaler tilbyr konfidensialitet. 
+særdeleshet antas det ikke at kanaler tilbyr konfidensialitet eller
+integritet.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bakgrunn}
@@ -95,8 +98,7 @@ og
 {\AAssign{\AVar{s}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}}.  Dersom
 \AVar{r} = \AVar{s} kan \APri{C} konkludere at \AVal{D'}=\AVal{D} med
 samme sikkerhet som \APri{B}.
-Det vil si at protokollen mellom
-$\APri{A}$ og $\APri{B}$ lakk (meta)informasjon til Charlie.
+Det vil si at protokollen lakk (meta)informasjon til Charlie.
 
 Evnen til å kunne verifisere om \AVal{D'}=\AVal{D} (når \AVal{D} er
 ment å være hemmelig)  er en betydelig fordel som
@@ -186,7 +188,7 @@ Noen velkjente språk er:
   Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
   tilhører ikke alle tall språket \textsc{Primes}
 \item [\textsc{Factor}]  Gitt to tall $n,k\in\mathbb{N}$, finnes det
-  et tall  $d \leq k$ som deler $n$, og
+  et tall  $1 < d \leq k$ som deler $n$, og
 \item [\textsc{Clique}] er spørsmålet om en graf inneholder en komplett
   sub-graf (klikk) med en gitt størrslse, sammen med problemene som
   representerer grafer hvor svaret er ``ja''.
@@ -214,7 +216,8 @@ egenskaper som alle andre.
 
 Når vi skal addere to tall, da legger vi først sammen siste siffer i
 begge tallene, deretter nest siste, og så videre.  Det vil si at
-kompleksiteten vokser lineært med lengden på tallene (dobbelt så lange
+kompleksiteten (arbeidsmengden) vokser lineært med lengden på tallene
+(dobbelt så lange 
 tall krever dobbelt så mange operasjoner).  Vi ser utelukkende på
 tallenes lengde, ikke deres ``størrelse''.  Kompleksiteten
 (arbeidsmengden) i addisjon vokser lineært med lengden på tallene som
@@ -242,7 +245,7 @@ derfor ingenting spart.  Derfor, når kompleksiteten er, for eksempel,
 $\mathcal{O}(N^2)$ er det enten i tid eller i rom.
 
 For en introduksjon til aymptotisk vekst anbefaler
-vi~\cite{graham1994concrete} eller, naturligvisk~\cite{knuth1997art1}.
+vi~\cite{graham1994concrete} eller, naturligvis~\cite{knuth1997art1}.
 
 
 \subsubsection{Klassen P}
@@ -296,7 +299,7 @@ En annen klasse, som inkluderer settet \textsf{P}, er \textsf{NP}.
 Språk i denne klassen er de hvor det er mulig å verifisere et
 bevis\footnote{På engelsk har \emph{proof} og \emph{evidence}
 forskjellig betydning.  Når vi snakker om \emph{bevis} her mener vi
-\emph{evidence}.} på at en instans har ``ja''-svar i polynomisk tid.
+\emph{proof}.} på at en instans har ``ja''-svar i polynomisk tid.
 At det finnes et bevis, som, igjen, er noe annet enn å finne beviset,
 er en sentral egenskap knyttet til språk
 
@@ -310,8 +313,9 @@ Et språk som ofte brukes som eksempel er \textsc{Sammensatt}: Gitt et
 heltall $n$, er det sammensatt (ikke prim)?
 Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
 
-på $x$ og $y$ (som naturligvis øker med lengden på $n$), men kun
-polynomisk.  Altså er \textsc{Sammensatt} i \textsf{NP}.  Kjernen er
+Bevisets lengde er summen av lengden på $x$ og $y$ (som naturligvis
+øker med lengden på $n$), men kun polynomisk.  Altså er
+\textsc{Sammensatt} i \textsf{NP}.  Kjernen er 
 at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
 men undersøke beviset er gyldig.
 
@@ -514,12 +518,13 @@ Vi skal benytte denne egenskapen senere.
 %
 %
 \subsection{Kryptering}
+\label{sec:krypto}
 
-et lar seg ikke gjøre å bevise at kryptering fungerer.  Det vi kan
-gjøre er å vise at problemer er i samme
-kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
-svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
-nettopp er knyttet til programvare heller enn teori.
+Det lar seg ikke gjøre å bevise at kryptering fungerer.  Beste vikan
+få til er å bygge på noe som er ``vanskelig''.
+Deretter håpe på at implementasjonen ikke
+svekker de teoretiske antagelsene; nær 100\% av alle svakheter
+er knyttet til programvare heller enn teori.
 
 Shannon~\cite{Shannon1949Communication} skrev for et par generasjoner
 siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
@@ -536,18 +541,16 @@ enhver som ``kun'' er utstyrt med  maskiner som har en rimelig sjanse
 i møte med problemer med kompleksitet tilsvarende i \textsf{BPP}.
 
 Under antagelsen om at \textsc{Faktorisering} er utenfor
-\textsf{BPP}--selv 
-om det dessverre ikke er noe som tyder på at det er i \textsf{NPC}--kan
-vi etablere kryptering med offentlige
-nøkler~\cite{Goldwasser1982probabilistic,Goldwasser1984Probabilistic}.
+\textsf{BPP}--selv om det dessverre ikke er noe som tyder på at det er
+i \textsf{NPC}--kan vi etablere asymmetrisk
+kryptering~\cite{Goldwasser1982probabilistic,Goldwasser1984Probabilistic}
+med interessante egenskaper (ut over hva \textsc{RSA} og \textsc{D-H}
+tilbyr).  I denne artikkelen er det kun konseptet om en sikker
+kryptering som brukes.
 
-Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{Pki} for å
-knytte entiteter som deltagere og kanaler (krypteringsnøkler)
-sammen~\cite{Lampson1992Authentication}.  Vi avstår, og legger til
-grunn at deltagerne på en sikker måte har utvekslet nøkler.
-
-Som kjent har kvantedatamaskineren annen beregningsmodell enn det
-definisjonen av \textsf{P} og \textsf{NP} bygger på.  Det ser
+Vi noterer i margen at kvantedatamaskiner har en annen
+beregningsmodell enn det definisjonen av \textsf{P} og \textsf{NP}
+bygger på.  Det ser 
 derfor ut til at de kan svare på spørsmål i språk utenfor
 \textsf{BPP} i polynomisk tid.  Her ligger årsaken til at
 kvantemaskiner og kryptering ofte okkuperer plass i samme setning.  Vi
@@ -592,6 +595,7 @@ Motto er ``Tenk på et lite (nok) tall''.
 
 
 \subsection{Protokoll basert på \textsc{Grafisomorfi}}
+\label{sec:grafisomorfi}
 
 Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kjenner
 en hemmelighet basert på mappingen mellom to isomorfe grafer, uten å
@@ -600,7 +604,7 @@ Protocol}.  Protokollens evne til å senke sannsynligheten henger
 på at \textsc{Grafisomorfi} ikke er i \textsf{BPP}.
 
 De to grafene $G_1 \cong G_2$ er offentlige, formodentlig produsert av
-\APri{B}.  Å genererer en kongurent kopi er i \textsf{P}.
+\APri{B}.  Å genererer en kongurent (kopi av en) graf er i \textsf{P}.
 
 Protokollen har tre meldinger kjøres til \APri{A} er fornøyd;
 vi kommer tilbake til hva det konkret betyr.
@@ -627,98 +631,104 @@ Meldingene og beregningene er som følger:
   steget åpner spørsmålet om protokollen er i \textsf{P} eller
   \textsf{BPP} -- et spørsmål vi naturligvis lar ligge;
 
-\item Dersom $\alpha=1$ da sender \APri{A} $m_1$ til \APri{B}.
+\item[$M_3$] Dersom $\alpha=1$ da sender \APri{A} $m_1$ til \APri{B}.
   Dersom $\alpha = 2$ sendes $m_2$.
   I begge tilfellene ser \APri{C}
-  kune en liste med verdier som er like lang som det er noder i
+  kun en liste med verdier som er like lang som det er noder i
   grafen.
 \end{enumerate}
 
 Alice har $p=1/2$ sannsynlighet for å svare rett.  Det vil si at for
 hver runde Alice svarer riktig synker sannsynligheten for at hun
 bare gjetter til halvparten.  Bob kan be Alice fortsette (kjøre runde
-etter runde) til han er overbevist (sannsynligheten blir
-tilfedsstillende lav for anvendelsen).
+etter runde) til han er overbevist fordi sannsynligheten blir
+tilfedsstillende lav for anvendelsen.
 
 Her er vi ved en ny antagelse: Akkurat som det er like usikkert at
 \textsc{Grafisomorfi} er i \textsf{BPP} som at
-\textsc{Faktorisering} er det må Bob gjøre en antagelse her om
+\textsc{Faktorisering} er det, må Bob gjøre en antagelse her om
 hvorvidt $p=2^{-64}$ (eller hva nå han nå velger) er tilstrekkelig til
 å kategorisere det som ``sikkert''.
 
 Vi bruker vår intuisjon, og konkluderer med at konseptet
 \textsc{Zero-Knowlede Protocol} faktisk lar seg realisere, og vil
 fungere under de rette antagelsene.
-Imidlertid er det ikke \emph{umulig} å bryte sikkerheten, for det
-underliggende problemet (\textsc{Grafisomorfi}) ikke er i
+Imidlertid er det ikke \emph{umulig} å bryte denne protokollen, for
+det underliggende problemet (\textsc{Grafisomorfi}) ikke er i
 \textsf{NPC}.
 
-Et annet spørsmål, for \textit{connoisseurs} fmå vi formode, er om
+Et annet spørsmål, for \textit{connoisseurs} må vi formode, er om
 resultatet (for Bob) blir det sammen om rundene kjører i parallell;
 det åpner svært utfordrende analytiske arenaer man kan danse på.  Vi
 avstår for øyeblikket.
 
 
-
 \subsection{Protokoll basert på \textsc{3-colour}}
 
-Vi skal nå anta at vi kan kryptere i tråd med 
-
-XXX
+Artikkelen antar nå assymetrisk kryptografi, som diskutert i
+Seksjon~\ref{sec:krypto}.
+Å knytte aktører og nøkler sammen er ikke enkelt.  Det er også mange
+subtile men viktige aspekter bak hvilke konklusjoner man
+kan trekke basert på meldinger som kommer til syne på
+(kryptering)kanaler~\cite{Lampson1992Authentication}.  Vi legger helt
+enkelt til grunn at nøklene er utvekslet på en trygg måte.
 
 Igjen er oppsettet at Alice ønsker å overbevise Bob om at hun kjenner 
 en hemmelighet, uten å lekke informasjon.  Her er det fristende å
 foreslå ``Han kan bare sende hemmeligheten kryptert til Alice for å
-bevise det'', men målet er å heller ikke lekke informasjon til ham;
-det ville være katastrofe å sende hemmeligheten til feil mottaker;
-igjen, de som drømmer om at \textsc{Pki} løser utfordringene må sette
-seg inn i antagelsene.
+bevise det''.  Formålet er å overbevise ham, ikke sende ham en
+hemmelighet det kanskje viser seg at han ikke kjente til.  Videre, den
+lille protokollen presentert i Seksjon~\ref{sec:bakgrunn}
+(side~\pageref{sec:bakgrunn}) forutsetter digitale
+fingeravtrykk\footnote{Hashing} som i seg selv krever nye
+undersøkelser; vi skal derfor greie oss uten.
 
 Denne gangen er hemmeligheten pakket inn som fargeleggingen av nodene
 i en graf; vi velger 3 farger uten tap av det generelle.
-
 Bob har publisert en graf $G=(VE)$ som han vet kan fargelegges;
 fargelkeggingen er hemmeligheten.  Alice ønsker å overbevise Bob om at
-hun kjenner hemmeligheten (fargeleggingen).  Fargeleggingen Bob har
-klaget kalles
-% Her mangler det notasjon: Alle nodene i V er tilordnet en verdi fra
-% settet {1,2,3}.  \in er neppe rett.
-$\phi: V \in \{1,2,3\}$
-%
-og viser hvilke noder som har hvilken farge.
+hun kjenner hemmeligheten (fargeleggingen).
 
-%
+Bob har laget farveleggingen $\phi: V \in \{1,2,3\}$ av grafen
+$G_B=(V,E)$.  Protokollen har tre meldinger, og gjentas til Bob er
+fornøyd; fornøyd betyr her det samme som i
+Seksjon~\ref{sec:grafisomorfi} men dog med andre tall.
+
 \begin{ASteps}
-  \ASend*{B}{A}{}\\
-  \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
-  \ASend*{A}{B}{\AVar{M}}[3]
+  \ASend*{A}{B}{$R_1, R_2,\cdots R_n$}\\
+  \ASend*{B}{A}{e} \\
+  \ASend*{A}{B}{$(\pi(\phi(u), r_u), (\pi(\phi(v)), r_v)$}
 \end{ASteps}
 
 
-Protokollen har tre meldinger, og gjentas til Bob fornøyd; mer om hva
-det innebærer nedenfor.
+Protokollen har tre meldinger:
 %
 \begin{enumerate}
-\item \APri{A} genrerer en kopi av $G$ og randomiserer nodenavnene.
-  Det gir en annen (men strukturelt lik) fargelegging av nodene og
-  formelt er $\pi \in_R Sym(\{1,2,3\})$ (som betyr at av settet av
-  alle permutasjoner av settet av farger (her 3) velges én).  A
-  genererer tilfeldige krypteringsnøkler $r_v$ og beregner
-  $R_v = krypt(\pi(\phi(v)), r_v)$ for alle $v \in V$.
-  A sender de kryptere meldingene $R_1, R_2, .... R_n$ til B;
+\item [$M_1$] APri{A} genrerer $G_A \cong G_B$ og $\pi \in_R Sym(\{1,2,3\})$
+  (fra settet av alle permutasjoner av settet av farger (her 3) velges
+  én).  \APri{A} genererer tilfeldige krypteringsnøkler
+  $r_v$ for alle $v \in V$.  For hver node krypterer \APri{A} den nye
+  mappingen sammen med 
+  den gamle $R_v = \textit{Encrypt}(\pi(\phi(v)), r_v)$.
 
-\item B velger en tilfeldig kant $e \in_R E$ og sender den til A.  Det
-  kan vi tenke på som at B ver A vise hun kjenner fargelegggingen av
-  de nodene som kanten knytter sammen.  Husk at $G$ er offentlig slik
-  at navnene på kantene er kjent, og
+  For eksempel: Om node $v$ hadde farge $1$, og $\pi: 1\to3$ da settes
+  fargen på alle noder som hadde farge $1$ til $3$.
+  
+  \APri{A} sender de kryptere meldingene $R_1, R_2, .... R_n$ til B;
 
-\item Dersom $e = (u,v) \in E$ beviser A at hun kjenner fargene i
-  disse to nodene ved å sende til B $(\pi(\phi(u), r_u)$ og
+\item [$M_2$] \APri{B} velger en tilfeldig kant $e \in E$ og sender
+  den til \APri{A}.  Det 
+  kan vi tenke på som at \APri{B} ber \APri{A} vise at hun kjenner
+  fargelegggingen av de nodene som kanten knytter sammen.  Husk at $G$
+  er offentlig slik at navnene på kantene er kjent, og
+
+\item \APri{A} beviser at hun kjenner fargen på disse nodene ved å
+  sende $(\pi(\phi(u), r_u)$ og
   $(\pi(\phi(v)), r_v)$ (innholdet i to i serien av krypterte
-  meldinger sendt i 0).
+  meldinger sendt i $M_1$).
 \end{enumerate}
 
-Nå vil B verifisere at
+Nå kan B verifisere at
 $R_u = krypt(\pi(\phi(u)), r_u)$,
 $R_v = krypt(\pi(\phi(v)), r_v)$,
 $\pi(\phi(u)) \not= \pi(\phi(v))$, og at
@@ -759,9 +769,18 @@ Satt sammen betyr det at:
 \begin{equation*}
 \textsf{P}\subseteq \textsf{NP}\subseteq \textsf{IP}=\textsf{PSPACE}  
 \end{equation*}
-Mankan finne dobbelt så mye som man ønsker å vite om denne relasjonen
+Man kan finne dobbelt så mye som man ønsker å vite om denne relasjonen
 i \cite[kapittel 12.2]{papadimitriou1994computational}.
 
+Arbeidet utvides med ytterligere to teorem:
+\begin{enumerate}
+\item Det er mulig å konstruere en oversetter som tar en protokoll
+  \textsc{P} beregnet på $n=2t+1$ ærlige deltagere og transformerer
+  den til en protokoll $P^\prime$ som oppnår det samme selv om $t$ av
+  $n$ deltagere nå er uærlige.  De uærlige kan avvike fra $P^\prime$ i
+  enhver, men polynomisk måte, og
+\item 
+\end{enumerate}
 
 \bibliographystyle{plain}
 \bibliography{zero}
