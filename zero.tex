@@ -11,7 +11,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 % Jeg liker ikke innrykk som start på avsnitt
-\usepackage{parskip}
+%\usepackage{parskip}
 
 % liker ikke høyrew-justerte marger
 \usepackage[document]{ragged2e}
@@ -70,11 +70,11 @@ login.  Alice mener hun har det, og ønkser å bevise det for Bob.  Når
 følgende protokoll er ferdig er \APri{B} overbevist om at \APri{A}
 også har (tilgang til) $D$: 
 
-\begin{ASteps*}
+\begin{ASteps}
   \ASend{A}{B}{\AStr{Kan jeg få adgang?}} \\
   \ASend{B}{A}{\ANonce{B}} \\
   \ASend{A}{B}{\AAssign{\AVar{x}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}}
-\end{ASteps*}
+\end{ASteps}
 %
 hvor notasjonen \AConcat betyr sammensetting
 (\textit{concatination}), \ANonce{B} ``et tilstrekkelig stort
@@ -468,9 +468,9 @@ at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
     \label{fig:two_graphs}
 \end{figure}
 
-Gitt en graf, kan man fargelegge alle nodene med ett gitt sett
-$\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik 
-at ingen noder med lik farge er forbundet med en kant?
+Gitt en graf $G=(V,E)$, er det mulig å fargelegge alle nodene med ett gitt
+sett $\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik at ingen noder med
+lik farge er forbundet med en kant?
 For å gjøre oppsettet så enkelt som mulig velger vi  $n=3$.  Det er da
 åpenbart at en graf hvor det finnes noder med mer enn tre kanter, så
 er svaret nei.
@@ -483,8 +483,8 @@ Det har vært kjent i mer enn 50 år at å avgjøre om en graf er med i
 \textsc{3-colour} er i \textsf{NPC}~\cite{Karp1972Reducibility, 
 GareyJohnson1979}.  Det vil si at å svare på om en gitt graf er i
 språket, er \emph{umulig}.  Videre, ethvert spørsmål som på en eller
-annen måte kan gjøres om (konverteres) til \textsc{3-colour} er
-\emph{umulig}; dette skal vi bruke senere.
+annen måte kan gjøres om (konverteres) til \textsc{3-colour} i
+polynomisk tid, også er \emph{umulig}; dette skal vi bruke senere.
 
 
 %
@@ -515,14 +515,7 @@ Vi skal benytte denne egenskapen senere.
 %
 \subsection{Kryptering}
 
-Før vi kan gå videre trenger vi å diskutere hvilke antagelser
-kryptering krever.  Det vanlige er å helt enkelt anta at
-\textsc{Factor} og/eller \textsc{DLG}\footnote{Discrete Logarithm
-Problem} ikke er i \textsf{BPP}.  Et 
-viktig tema i dette notatet er å få grep om antagelser, og da er
-kryptering viktig.
-
-Det lar seg ikke gjøre å bevise at kryptering fungerer.  Det vi kan
+et lar seg ikke gjøre å bevise at kryptering fungerer.  Det vi kan
 gjøre er å vise at problemer er i samme
 kompleksitetsklasse.  Så får vi bare håpe at implementasjonen ikke
 svekker de teoretiske antagelsene selv om nær 100\% av alle svakheter
@@ -534,25 +527,24 @@ under antagelsen om ``ekte'' tilfeldighet er sikkert; for å
 si det forsiktig er diskusjonen om ``ekte'' tilfeldighet ganske
 omfattende og vi lar det ligge.  Det er tilstrekkelig å vite at
 kryptering kan gjøres helt (!) vanntett om man ønsker\footnote{Ordet
-\emph{umulig} er gitt en annen betydning og kan derfor ikke brukes her.}.
+\emph{umulig} er gitt en annen betydning og kan derfor ikke brukes
+her.}.
 
-I
-praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
+I praksis må vi anta noe mer anvendelig.  Den mest benyttede antagelsen
 er fra vår egen levetid og er at krypteringen er sikker i møte med
-enhver som ``kun'' er utstyrt med  maskiner som kan avgjøre om et
-spørsmål i et språk som er med i
-\textsf{BPP}~\cite{Goldwasser1984Probabilistic}.  En annen måte å si
-det på, er at med mindre en kjent (og akseptert) antagelser--for
-eksempel $\textsf{P} \not= \textsf{NP}$--ikke lenger holder, så holder
-krypteringen (igjen, med forbehold om feil i programvare).
+enhver som ``kun'' er utstyrt med  maskiner som har en rimelig sjanse
+i møte med problemer med kompleksitet tilsvarende i \textsf{BPP}.
+
+Under antagelsen om at \textsc{Faktorisering} er utenfor
+\textsf{BPP}--selv 
+om det dessverre ikke er noe som tyder på at det er i \textsf{NPC}--kan
+vi etablere kryptering med offentlige
+nøkler~\cite{Goldwasser1982probabilistic,Goldwasser1984Probabilistic}.
 
 Om sikkerheten ikke er så nøye, da kan man bruke en \textsc{Pki} for å
 knytte entiteter som deltagere og kanaler (krypteringsnøkler)
-sammen~\cite{Lampson1992Authentication}.  Fordi
-offentlig-nøkkel kryptografi hviler på alt for mange antagelser legger
-vi slike løsninger bort uten noe om-og-men.  Det eneste kloke er å bruke
-delt-nøkkel kryptering til å sikre informasjon som brukes til å
-formidle kunnskap om hemmeligheter.
+sammen~\cite{Lampson1992Authentication}.  Vi avstår, og legger til
+grunn at deltagerne på en sikker måte har utvekslet nøkler.
 
 Som kjent har kvantedatamaskineren annen beregningsmodell enn det
 definisjonen av \textsf{P} og \textsf{NP} bygger på.  Det ser
@@ -599,62 +591,60 @@ sannsynligheten for at Alice lurer ham til et nivå han kan leve med.
 Motto er ``Tenk på et lite (nok) tall''.
 
 
-\subsection{Protokoll basert på isomorfi}
+\subsection{Protokoll basert på \textsc{Grafisomorfi}}
 
 Vi skal nå beskrive hvordan Alice kan overbevise Bob om at hun kjenner
 en hemmelighet basert på mappingen mellom to isomorfe grafer, uten å
 avsløre noe om grafene.  Det vil si: en \textsc{Zero-Knowledge
 Protocol}.  Protokollens evne til å senke sannsynligheten henger
-på at \textsc{Grafisomorfi} ikke er i \textsf{P}.
+på at \textsc{Grafisomorfi} ikke er i \textsf{BPP}.
 
-Grafene $G_1$ og $G_2$ er offentlige, formodentlig produsert av
-\APri{B}.
-Han har først generert $G_1$ og fra den laget en kopi, med andre
-identifikatorer på nodene.  Fordi han har laget de to grafene, kjenner
-han mappingen mellom nodene.
+De to grafene $G_1 \cong G_2$ er offentlige, formodentlig produsert av
+\APri{B}.  Å genererer en kongurent kopi er i \textsf{P}.
 
-\APri{A} kjenner også mappingen, og ønsker å overbevise \APri{B} om at
-så er tilfelle.
 Protokollen har tre meldinger kjøres til \APri{A} er fornøyd;
 vi kommer tilbake til hva det konkret betyr.
 
 \begin{ASteps}
   \ASend*{B}{A}{\AVar{H}}[1] \\
   \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
-  \ASend*{A}{B}{\AVar{M}}[3]
+  \ASend*{A}{B}{\AVar{m_\alpha}}[3]
 \end{ASteps}
 
 Meldingene og beregningene er som følger:
 
 \begin{enumerate}
-\item \APri{A} generer en isomorf kopi $H$ av $G_1$.  Mappingen
-  mellom $G_1$ og $H$ kaller vi \AVar{m_1} og mappingen mellom $G_2$ og $H$
-  kaller vi \AVar{M_2}.  \APri{A} sender $H$ til 
+\item[$M_1$] \APri{A} generer $H \cong G_1$.  Mappingen
+  mellom $G_1$ og $H$ kaller vi \AVar{\phi_1} og mappingen mellom $G_2$
+  og $H$ 
+  kaller vi \AVar{\phi_2}.  \APri{A} sender $H$ til 
   \APri{B}.  \APri{C} ser kun en graf han mistenker er isomorf med
   $G_1$ men kan i praksis ikke verifisere at det er tilfelle (fordi
-  \textsc{Grafisomorfi} ikke er i $\mathcal{BPP}$);
-\item Etter å ha mottatt $H$, genererer \APri{B} et tilfeldig tall
+  \textsc{Grafisomorfi} ikke er i \textsf{BPP});
+
+\item[$M_2$] Etter å ha mottatt $H$, genererer \APri{B} et tilfeldig tall
   $\alpha \in \{1,2\}$ og sender til \APri{A}.  Vi noterer at dette
   steget åpner spørsmålet om protokollen er i \textsf{P} eller
   \textsf{BPP} -- et spørsmål vi naturligvis lar ligge;
-\item Dersom $\alpha=1$ da sender \APri{A} $M_1$ til \APri{B}.
-  Dersom $\alpha = 2$ sendes $M_2$.  I begge tilfellene ser \APri{C}
+
+\item Dersom $\alpha=1$ da sender \APri{A} $m_1$ til \APri{B}.
+  Dersom $\alpha = 2$ sendes $m_2$.
+  I begge tilfellene ser \APri{C}
   kune en liste med verdier som er like lang som det er noder i
   grafen.
 \end{enumerate}
 
 Alice har $p=1/2$ sannsynlighet for å svare rett.  Det vil si at for
-hver runde Alice svarer riktig synker sannsynligheten for at Alice
+hver runde Alice svarer riktig synker sannsynligheten for at hun
 bare gjetter til halvparten.  Bob kan be Alice fortsette (kjøre runde
 etter runde) til han er overbevist (sannsynligheten blir
-tilfedsstillende lav).
+tilfedsstillende lav for anvendelsen).
 
 Her er vi ved en ny antagelse: Akkurat som det er like usikkert at
 \textsc{Grafisomorfi} er i \textsf{BPP} som at
-\textsc{Faktorisering} er det--alle som bruker RSA i sin PKI (for
-eksempel PIT) antar at $\textsf{P} \not= \textsf{BPP}$--en antagelse
-at $p=2^{-64}$ (eller hva nå Bob velger) er tilstrekkelig til å
-kategorisere det som ``sikkert''.
+\textsc{Faktorisering} er det må Bob gjøre en antagelse her om
+hvorvidt $p=2^{-64}$ (eller hva nå han nå velger) er tilstrekkelig til
+å kategorisere det som ``sikkert''.
 
 Vi bruker vår intuisjon, og konkluderer med at konseptet
 \textsc{Zero-Knowlede Protocol} faktisk lar seg realisere, og vil
@@ -663,32 +653,29 @@ Imidlertid er det ikke \emph{umulig} å bryte sikkerheten, for det
 underliggende problemet (\textsc{Grafisomorfi}) ikke er i
 \textsf{NPC}.
 
-Et spørsmål for \textit{connoisseurs} er om resultatet (for Bob) blir
-det sammen om rundene kjører i parallell; det åpner svært utfordrende
-analytiske arenaer man kan danse på, men vi går ikke nærmere inn på.
-det her.
+Et annet spørsmål, for \textit{connoisseurs} fmå vi formode, er om
+resultatet (for Bob) blir det sammen om rundene kjører i parallell;
+det åpner svært utfordrende analytiske arenaer man kan danse på.  Vi
+avstår for øyeblikket.
 
 
 
 \subsection{Protokoll basert på \textsc{3-colour}}
 
-Igjen er oppsettet at Bob ønsker å overbeivse Alice om at han kjenner
+Vi skal nå anta at vi kan kryptere i tråd med 
+
+XXX
+
+Igjen er oppsettet at Alice ønsker å overbevise Bob om at hun kjenner 
 en hemmelighet, uten å lekke informasjon.  Her er det fristende å
 foreslå ``Han kan bare sende hemmeligheten kryptert til Alice for å
 bevise det'', men målet er å heller ikke lekke informasjon til ham;
-det ville være katastrofe å sende hemmeligheten til feril mottaker;
+det ville være katastrofe å sende hemmeligheten til feil mottaker;
 igjen, de som drømmer om at \textsc{Pki} løser utfordringene må sette
 seg inn i antagelsene.
 
-Denne gangen er hemmeligheten pakket inn somfargeleggingen av nodene i
-en graf; vi velger 3 farger uten tap av det generelle.
-
-% Her kommer sikkert AA og redder meg.
-\begin{ASteps}
-  \ASend*{B}{A}{}\\
-  \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
-  \ASend*{A}{B}{\AVar{M}}[3]
-\end{ASteps}
+Denne gangen er hemmeligheten pakket inn som fargeleggingen av nodene
+i en graf; vi velger 3 farger uten tap av det generelle.
 
 Bob har publisert en graf $G=(VE)$ som han vet kan fargelegges;
 fargelkeggingen er hemmeligheten.  Alice ønsker å overbevise Bob om at
@@ -699,6 +686,14 @@ klaget kalles
 $\phi: V \in \{1,2,3\}$
 %
 og viser hvilke noder som har hvilken farge.
+
+%
+\begin{ASteps}
+  \ASend*{B}{A}{}\\
+  \ASend*{B}{A}{\ARandom{\alpha}}[2] \\
+  \ASend*{A}{B}{\AVar{M}}[3]
+\end{ASteps}
+
 
 Protokollen har tre meldinger, og gjentas til Bob fornøyd; mer om hva
 det innebærer nedenfor.
