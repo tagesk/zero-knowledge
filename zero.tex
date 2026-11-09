@@ -39,7 +39,8 @@
 
 
 \section{Innledning}
-Dette tekniske notatet gir en oversikt over en publisert
+I dette tekniske notatet frisker vi opp nødvendige
+bakgrunnskunnskaper, før vi diskuterer hovedresultatene i en
 artikkel~\cite{Goldwasser1985Knowledge,Goldwasser1989Knowledge}.
 Fordi dette notatet beskriver en artikkel er her ingen nye resultater.
 Termer som ``artikkelen'', ``kapittel 2'', ``figur 2'', og tilsvarende
@@ -49,6 +50,9 @@ referere til denne teksten bruker vi eksplisitt ``i dette notatet''.
 Vi har hatt utgangspunkt i~\cite{Goldwasser1985Knowledge} heller
 enn~\cite{Goldwasser1989Knowledge} fordi den er mindre omfattende men
 likevel dekker det sentrale begrepet \textsc{Zero-Knowledge Protocol}.
+
+Notasjonen er strengt tatt ikke nødvendig for å få grep om konseptene.
+Men notasjon er nå en gang et verktøy man må beherske.
 
 Det gjøres ingen antagelser om kanaler som meldinger sendes på, utover
 ordning i tid (en melding ankommer ikke før den er sendt).  I
@@ -60,18 +64,19 @@ integritet.
 \label{sec:bakgrunn}
 Tema er hvordan  Alice kan overbevise Bob at hun kjenner en
 hemmelighet, uten å hverken fortelle noe av verdi til Bob (ut over at
-hun kjenner hemmeligheten), og heller ikke til Charlie (som ikke
-kjenner hemmeligheten) som lytter på samtalen.  Det er en fordel om
+hun kjenner hemmeligheten), og heller ikke til Charlie, som ikke
+kjenner hemmeligheten, men som lytter på samtalen.  Det er en fordel om
 Charlie heller ikke kan konkludere at Alice kjenner hemmeligheten ut
-fra kommunikasjonen.
+fra kommunikasjonen.  Vi ønsker at protokollen terminerer uten at
+Charlie kan vite utfallet.
 
 For eksempel: Gitt at Bob har konfidensielle data, for eksempel
 et dokument, et passord, eller noe tilsvarende; la oss kalle
-dokumentet for $D$.  Han tilbyr ett eller 
-annet til andre som også har dokumentet, for eksempel en form for
+dokumentet for $D$.  Han tilbyr ett eller annet til andre som også har
+dokumentet, for eksempel en form for 
 login.  Alice mener hun har det, og ønkser å bevise det for Bob.  Når
-følgende protokoll er ferdig er \APri{B} overbevist om at \APri{A}
-også har (tilgang til) $D$: 
+følgende protokoll er ferdig er \APri{B} overbevist om at også
+\APri{A} har (tilgang til) $D$:
 
 \begin{ASteps}
   \ASend{A}{B}{\AStr{Kan jeg få adgang?}} \\
@@ -82,7 +87,7 @@ også har (tilgang til) $D$:
 hvor notasjonen \AConcat betyr sammensetting
 (\textit{concatination}), \ANonce{B} ``et tilstrekkelig stort
 tilfeldig tall'' (la oss si $\approx2^{256}$), og \AChash{m} et
-digitalit fingeravtrykk (\textit{hashing}) av \AVal{m}.  \APri{B}
+digitalt fingeravtrykk (\textit{hashing}) av \AVal{m}.  \APri{B}
 beregner selv \AAssign{\AVar{y}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}.
 Dersom \AVar{x}=\AVar{y} kan \APri{B} konkludere at \APri{A} kjenner
 (eller har tilgang til) \AVal{D}.  Vi noterer i
@@ -90,30 +95,31 @@ margen at denne enkle protokollen har mange svakheter og ikke
 tilfredsstiller moderne krav til å være sikker.
 
 Fordi han lytter på all kommunikasjon kjenner Charlie nå \ANonce{B}
-og \AChash{\ANonce{B} \AConcat \AVal{D}}.  Det vil si at om han har
-stjålet et dokument \AVal{D'} kan han undersøke om \AVal{D'}=\AVal{D}
+og \AAssign{\AVar{x}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}.  Det vil
+si at om han har 
+stjålet et dokument \AVal{D'} kan han undersøke om \AVal{D'}=\AVal{D} 
 ved å beregne
-{\AAssign{\AVar{r}}{\AChash{\ANonce{B} \AConcat \AVal{D'}}}}
-og
-{\AAssign{\AVar{s}}{\AChash{\ANonce{B} \AConcat \AVal{D}}}}.  Dersom
-\AVar{r} = \AVar{s} kan \APri{C} konkludere at \AVal{D'}=\AVal{D} med
+{\AAssign{\AVar{z}}{\AChash{\ANonce{B} \AConcat \AVal{D'}}}}
+\AVar{z} = \AVar{x} kan \APri{C} konkludere at \AVal{D'}=\AVal{D} med 
 samme sikkerhet som \APri{B}.
 Det vil si at protokollen lakk (meta)informasjon til Charlie.
 
-Evnen til å kunne verifisere om \AVal{D'}=\AVal{D} (når \AVal{D} er
+Evnen til å kunne verifisere om $\AVal{D'}=\AVal{D}$, og tilsvarende
+kunne fastslå at $\AVal{D}\not=\AVal{D^\prime}$, (når \AVal{D} er
 ment å være hemmelig)  er en betydelig fordel som
 kan gi næring til mange typer angrep.  \textsc{Zero-Knowledge
   Protocol} handler 
-om å overbevise den andre om noe, uten å lekke informasjon.  For å
+om å overbevise en annen om noe, uten å lekke informasjon.  For å
 illustrere hva som menes, la Alice og Bob sitte på hver sin side av
-bordet, med en kortstokk mellom seg.  Alice trekker et kort, og ser på
+bordet, med en kortstokk mellom seg.  Alice trekker ett kort, ser på
 det, og legger det med baksiden opp; kortet var rødt (hjerter eller
 ruter).  Spørsmålet er: Hvordan kan Alice overbevise Bob om at hun
 trakk et rødt kort uten å vise ham det eller avsløre noe annet av
 verdi?
 
-La Alice gå gjennom stokken og plukke ut de 26 sorte kortene (kløver
-og spar) og legge dem på bordet så Bob kan se dem.  Under antagelsen
+Det er enkelt, for  Alice kan gå gjennom stokken og plukke ut de 26
+sorte kortene (kløver og spar) og legge dem på bordet så Bob kan se
+dem.  Under antagelsen 
 om at kortstokken er ``ekte'' kan han konkludere uten mulighet for å
 gjøre feil at Alice trakk et rødt kort.
 
@@ -123,9 +129,12 @@ den har 52 kort, ikke inneholder en \emph{joker}, har 13 kort av hver
 (kort)farge, samt den fysiske omgivelsen som må etableres (hva
 innbærer det å sitte på andre siden av bordet?).
 
+Også denne protokollen har
+svakheter i og med at Charlie lærer hemmeligheten (at Alice trakk et
+rødt kort), men illustrerer poenget.
 Som vi skal se må det alltid gjøres antagelser; styrken i systemet
 avhenger av hva som legges til grunn.  Kompleksitetsteori er verktøyet
-for å snakke om antagelser. 
+for å snakke om styrken i antagelser. 
 
 
 %
@@ -133,7 +142,7 @@ for å snakke om antagelser.
 \section{Matematisk utgangspunkt}
 \label{sec:utgangspunkt}
 Den matematiske konteksten i artikkelen er språk og
-kompleksitetsklasser; vi gir derfor en kort oppfriskning.  Før vi
+kompleksitetsklasser.  Før vi 
 kommer til artikkelens bidrag må vi introdusere to vekjente språk
 knyttet til grafer, og snakke litt om kryptering.
 
@@ -141,18 +150,15 @@ knyttet til grafer, og snakke litt om kryptering.
 Alan Turing var den første til å representere (matematiske) spørsmål
 med symboler (tekst)~\cite{Turing1937Computable}.  Han representerte
 dem på datidens mest avanserte teknologi: Papirstrimmel.  Det var
-først 25 år 
-senere at det ble forstått at dersom et problem representeres som en
+først 25 år senere at det ble forstått at dersom et problem
+representeres som en 
 kompakt streng (sekvens av symboler) så vil lengden av strengen være
 et mål på ``størrelsen'' av problemet~\cite{Hartmanis1965Complexity}.
-For en introduksjon til anbefaler vi~\cite{AroraBarak2009Complexity};
-første kapittel går nøye gjennom representasjon av problemer.
 
 I spørsmål om involverer tall er det åpenbart hvordan problemet skal
 representeres. For eksempel: Om spørsmålet er: ``Er tallet et
 primtall?'' så er instansen av problemet som skal besvares et tall.
 Tallet (problemet) kan være $323$ (som vil si $(101000011)_2$).
-Vi har altså et spørsmål og et problem (i konktekst av spørsmålet).
 
 Når spørsmålet omhandler en graf, for eksempel om grafen er forbundet,
 kan kan vi konvertere grafen til en matrise (hvor $M_{ij}=0$ om det
@@ -160,19 +166,28 @@ ikke er en kant mellom nodene $i$ og $j$).  Når en slik matrise
 skrives ut blir resultatet igjen en streng (av $0$ og $1$).  Lengden
 på dette problemet er naturligvis produktet av dimensjonene.
 
-Det finnes mer kompakte måter å gjøre det på, men i praksis spiller
-det ingen rolle.  Konstant-leddet i en slik konvertering blir
-i praksis uten betydning.
+Det er mange måter å representere et problem på.  For tall er det
+åpenbare valget av tallsystem.  La oss ta utgangspunkt i $2^{100}$.  I
+hex er tallet $28$ siffer langt, med base 10 har det $31$, mens binært har
+det $100$.  Tallene for $2^{101}$ er $28$, $31$, og $101$.  Mens
+forskjellen i representasjon er svært liten er $2^{101} - 2^{100} =
+1.267.650.600.228.229.401.496.703.205.376$.  Det man kan spare ved å
+skifte representasjon druker fullstendig i forhold til effekten i
+endring i lengden.  Det samme gjelder grafer, og, viser deg seg, alle
+andre typer problemer vi skal representere.
+
+Indirekte har vi nå også fått et mål på størrelse: Jo lenger streng jo
+større problem.
+Legg merke til at tallet $1234567890$ er ti ganger så
+stort som tallet $123456789$.  Men som problem er $1234567890$ bare
+10\% større (lengere).  Tall er en svært effektiv måte å representere
+problemer på.
+For en introduksjon anbefaler vi~\cite{AroraBarak2009Complexity};
+første kapittel går nøye gjennom representasjon av problemer.
 
 Når vi bruker strenger til å representere problemer på denne måten kan
 vi betrakte strengene som et ``ord''; hvert ord representerer ett
-(og bare ett) problem.  Indirekte har vi nå også fått et mål på
-størrelse: Jo lenger streng jo større problem.
-Legg merke til at tallet $1234567890$ er ti ganger så
-stort som tallet $123456789$.  Men som problem er $1234567890$ bare
-10\% større (lengere).  Det er fordi tall er en svært effektiv måte å
-representere problemer på.
-
+(og bare ett) problem.  
 Problemene til et gitt spørsmål er et (uendelig) sett av strenger.
 Spørsmålet deler dette settet to: De problemer som har svaret ``ja''
 og de som ikke har svaret ``ja''.
@@ -182,34 +197,34 @@ som har svaret ``ja'', det kaller vi \emph{et språk}.
 
 Noen velkjente språk er:
 \begin{description}
-\item [\textsc{Primes}] er språket som inkluderer spørsmålet om $n \in
+\item [\textsc{Prime}] er språket som inkluderer spørsmålet om $n \in
   \mathbb{N}$ er prim 
   og settet med tall hvor svaret er ``ja''.
   Akkurat som ikke alle bokstavkombinasjoner tilhører språket norsk,
   tilhører ikke alle tall språket \textsc{Primes}
 \item [\textsc{Factor}]  Gitt to tall $n,k\in\mathbb{N}$, finnes det
-  et tall  $1 < d \leq k$ som deler $n$, og
+  et tall  $1 < d \leq k$ som dividerer $n$, og
 \item [\textsc{Clique}] er spørsmålet om en graf inneholder en komplett
   sub-graf (klikk) med en gitt størrslse, sammen med problemene som
   representerer grafer hvor svaret er ``ja''.
 \end{description}
 For å gjøre det enkelt setter vi som regel spørsmålet opp om
-``ja/nei''; ``Finnes det...'' heller enn ``Hva er...''.
+``ja/nei'' eller ``Finnes det...'' heller enn ``Hva er...''.
 
 
 \subsection{Kompleksitesklasser}
 
 Det viser seg at språkene faller naturlig ned i et sett med klasser
-avhengig av hvor mye det krever å finne det;
+avhengig av hvor mye det krever å finne svar på spørsmålet;
 vi kaller dem kompleksitetsklasser.  Klassene skiller seg fra
 hverandre ved noen sentrale egenskaper knyttet til arbeidsmengde.
 
 Det essensielle er at alle spørsmål i et språk er ``like''.  For
 eksempel er faktorisering av store tall som er produktet av kun to
-primfaktorer lik for alle tall av lik størrelse.  Det vil si at vi kan
-bygge en løsning rundt faktorisering uten på forhånd velge hvilke tall
-som skal inngå.  Hver instans er ``frisk'' og med samme
-egenskaper som alle andre.
+primfaktorer mer eller mindre lik for alle tall av lik størrelse.  Det
+vil si at vi kan bygge en løsning rundt faktorisering uten på forhånd
+velge hvilke tall som skal inngå.  Hver instans er ``frisk'' og med
+samme egenskaper som alle andre.
 
 
 \subsubsection{Vekst}
@@ -221,11 +236,11 @@ kompleksiteten (arbeidsmengden) vokser lineært med lengden på tallene
 tall krever dobbelt så mange operasjoner).  Vi ser utelukkende på
 tallenes lengde, ikke deres ``størrelse''.  Kompleksiteten
 (arbeidsmengden) i addisjon vokser lineært med lengden på tallene som
-skal legges sammen.  
+skal legges sammen.  Uavhengig av hvilket tall-system som er brukt.
 
 Multiplikasjon krever at vi ganger hvert siffer i tallene med
-de andre, og summerer resultatene til slutt.  Mest arbeid er det når
-tallene er like lange.  Kompleksiteten i multiplikasjon er derfor
+de andre, og legger sammen resultatene til slutt.  Mest arbeid er det
+når tallene er like lange.  Kompleksiteten i multiplikasjon er derfor
 ${N}^2$ hvor $N$ her ikke er tallene men lengden.
 
 Addisjonen vi gjør  til slutt blir fort neglisjerbar i forhold til
@@ -245,7 +260,8 @@ derfor ingenting spart.  Derfor, når kompleksiteten er, for eksempel,
 $\mathcal{O}(N^2)$ er det enten i tid eller i rom.
 
 For en introduksjon til aymptotisk vekst anbefaler
-vi~\cite{graham1994concrete} eller, naturligvis~\cite{knuth1997art1}.
+vi~\cite{graham1994concrete} eller, naturligvis
+originalen~\cite{knuth1997art1}. 
 
 
 \subsubsection{Klassen P}
@@ -270,21 +286,17 @@ siste bit er 0 eller 1.  Det tar fast tid (uavhengig av lengen).
 graf $G$ og to noder $a,b$ spør om det er en sti mellom dem.
 Hverken bredde-først eller dybde-først vokser raskene enn antall noder
 den skal besøke.  Det vil si at veksten er polynomisk når størrelsen
-på $G$ er målet.  Språket \textsc{Sti} er derfor i \textsf{P}.
+på $G$ er målet.  Språket \textsc{Sti} er derfor i \textsf{P}.  Det er
+``lett'' å finne ut som det er en sti mellom to noder i en graf.
 
-Det er lett å finne ut om $n$ er prim (prøve å dividere med alle tall
-$<\sqrt{n}$) om enn tidkrevende om $n$ er stor.  Som problem i et
-språk måler vi $N$ som lengden.  Et tall som er dobbelt så
-\emph{langt} som et annet, for eksempel 20 mot 10 siffer, det er svært
-mye større.  Denne algoritmen gir derfor eksponensiell vekst i antall
-operasjoner (målt mot $N$ som er lengden av $n$).
-Heldigvis finnes det mer effektive algoritmer; det beste vi kjenner er
-$\mathcal{O}({\log}^6 n)$\cite{Agrawal2004}.  Det er avgjørende her å se
-at å avgjøre om et tall er prim eller ei er noe annet og mye lettere
-enn å faktisk finne primfaktorene.  Språket \textsc{Primes} er derfor
-i \textsf{P}.
+\textsf{P} er et lite sett, og språkene der er ofte spesialtilfeller
+av mer kompliserte og generelle problemer.
 
-\subsubsection{\textsf{BPP} (Bounded-error Probabilistic Polynomial time)}
+
+%
+%
+\subsubsection{\textsf{BPP} (Bounded-error Probabilistic Polynomial
+  time)}
 For at beskrivelsen skal være korrekt nevner vi at fordi det ikke er
 bevist at \textsl{psaudorandomness} i det generelle tilfellet kan
 erstatte ekte tilfeldighet, så er $\textsf{P} \subset \textsf{BPP}$.
@@ -295,48 +307,44 @@ Men som alle andre antar vi at så er tilfelle, og at $\textsf{P} =
 %
 \subsubsection{Klassen NP}
 
-En annen klasse, som inkluderer settet \textsf{P}, er \textsf{NP}.
-Språk i denne klassen er de hvor det er mulig å verifisere et
-bevis\footnote{På engelsk har \emph{proof} og \emph{evidence}
+\textsf{NP}, som inkluderer settet \textsf{P}, er språk hvor det er
+mulig å verifisere et bevis\footnote{På engelsk har \emph{proof} og
+\emph{evidence} 
 forskjellig betydning.  Når vi snakker om \emph{bevis} her mener vi
-\emph{proof}.} på at en instans har ``ja''-svar i polynomisk tid.
-At det finnes et bevis, som, igjen, er noe annet enn å finne beviset,
-er en sentral egenskap knyttet til språk
+\emph{proof}.} i polynomisk tid på at en instans har ``ja''-svar.
 
-For å se at \textsf{P} er innholdt i \textsf{NP} er det
-tilstrekkelig å notere at 
-elementene  i \textsf{P} kan konstrueres i polynomisk tid.  Det vil
-si det ikke er behov for noe bevis i det hele tatt; man kan bare regne
-ut løsningen.
+For å se at \textsf{P} er innholdt i \textsf{NP} er det tilstrekkelig
+å notere at  elementene i \textsf{P} kan konstrueres i polynomisk
+tid.  Det vil si det ikke er behov for noe bevis i det hele tatt; man
+kan bare regne ut løsningen.
 
-Et språk som ofte brukes som eksempel er \textsc{Sammensatt}: Gitt et
+Et språk som ofte brukes som eksempel er \textsc{Prim}: Gitt et
 heltall $n$, er det sammensatt (ikke prim)?
-Et bevis for at $n$ er sammendatt (et ``ja''-svar) er $n=xy$.
-
+Et bevis for at $n$ er sammensatt (et ``ja''-svar) er $n=xy$.
 Bevisets lengde er summen av lengden på $x$ og $y$ (som naturligvis
 øker med lengden på $n$), men kun polynomisk.  Altså er
-\textsc{Sammensatt} i \textsf{NP}.  Kjernen er 
-at det som skal gjøres er ikke å finne ut om et tall er sammensatt,
-men undersøke beviset er gyldig.
+\textsc{Prim} i \textsf{NP}.  Kjernen er at det som skal gjøres er
+ikke å finne ut om et tall er sammensatt eller finne faktorene, men
+undersøke beviset er gyldig.
 
-\textsc{Primes} er også i \textsf{NP} fordi det finnes et bevis som
-kan verifiseres i polynomisk tid\footnote{\textsc{Primes} ble
-opprinnelig (1975) plassert i \textsf{NP}.  Senere har det vist seg å
-være i \textsf{P}, altså ``enklere'' enn man opprinnelig trodde.}.
-Dersom $n$ er prim da vil det finnes en $a^{n-1} = 1 (= n)$ og for 
-hver primfaktor $q$ av $n-1$ vil $a^{(n-1)/q} \not= 1 (= n)$.  Et
-bevis for at $n$ er prim vil være $a$ sammen med faktoriseringen av
-$n-1$ (og tilsvarende bevis for at de faktorene er prim).
+I moargen noterer jeg at det jeg lærte på 90-tallet om at
+\textsc{Primes} var i \textsf{NP} men utenfor \textsf{P} nå er kjent å
+ikke være tilfelle.  \textsc{Primes} utenfor \textsf{P} fra 1972 til
+2004; det er nå kjent å være $\mathcal{O}({\log}^6 n)$ altså
+``enklere'' enn man opprinnelig trodde~\cite{Agrawal2004}.
 
 Minner igjen om at å finne ut om $n$ er prim er ett problem mens
 avgjøre om beviset på at $n$ er prim er gyldig, er et annet. Kravet
 for at et problem er i \textsf{NP} er altså at det finnes et bevis (og
 ikke nødvendigvis at beviset er ``lett'' å finne). 
 
-%
+
 %
 \subsubsection{Klassen \textsf{NPC}}
-Noen problemer som har et enkel bevis, men beviset er svært vanskelig
+Ettersom $\textsf{P} \subseteq \textsf{NP}$ er det interessant å se på
+problemene $\textsf{P} \setminus \textsf{NP}$.
+
+Noen problemer har et enkel bevis, men beviset er svært vanskelig
 å finne.  For eksempel:
 \begin{itemize}
 \item \textsc{Travelling salesman}: Gitt en graf med vektede kanter,
@@ -373,7 +381,7 @@ Det må understrekes at det er forventningen (les: sannsynligheten) som
 er hindringen.  For eksempel: Gitt et 60 sifret tall tall som er
 produktet av to 30-sifret primtall, da er det mulig å være heldig å
 gjette de to faktorene på første forsøk.  Sannsynligheten for det er
-svært liten, og derfor starter vi ikke engang på oppgaven.
+svært (!) liten, og derfor starter vi ikke på oppgaven.
 Noe er derfor \emph{umulig} dersom den forventede arbeidsmengden
 \textsc{Per Se} gjør at man avstår.
 
@@ -385,7 +393,6 @@ Her noterer vi med en viss interesse at hverken RSA (basert på
 %
 %
 \subsection{Eksempler}
-
 Fordi klassen \textsc{NPC} er sentral i artikkelen skal vi gå gjennom
 to eksempler; begge er grafer.
 Det ene i \textsf{NP} men utenfor \textsf{BPP} det andre i \textsf{NPC}.  
@@ -427,7 +434,7 @@ noder og kanten er forskjellig.
 kopi av en graf.  Det er i praksis ``bare'' å flytte rundt på det som
 identifiserer nodene og bygge opp mappingen mens man gir nodene nytt
 navn.
-Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er altså en liste
+Overgangen mellom to isomorfe grafer $G_1$ til $G_2$ er en liste
 som viser hvordan identifikatorene på nodene er knyttet til hverandre.
 Listen er naturligvis like lang som det er noder i grafen.  En slik
 mapping kan brukes begge veier, og i flere ledd; én graf brukes til å
@@ -435,11 +442,10 @@ generere en ny, som brukes\ldots  Vi skal komme tilbake til denne
 egenskapen litt senere.
 
 Selve mappingen er en liste med navn (på noder, se
-Figur~\ref{fig:to_grafer}).  Den forteller ingenting om grafenes
+Figur~\ref{fig:to_grafer}).  Den forteller ingenting om grafenes 
 struktur (som er det isomorfi handler om).  Særlig: Gitt en graf og en
 mapping kan man (kun) lære at det finnes en isomorf graf, men verdien
 av den kunnskapen er null ettersom det for alle grafer kan lages en
-
 
 Det er ikke er lett å avgjøre om to grafer er isomorfe, selv om det
 ikke er \emph{umulig}.  Så vidt man vet er språket
@@ -472,7 +478,8 @@ at to grafer er isomorfe: \textsc{Grafisomorfe} er derfor klart i
     \label{fig:two_graphs}
 \end{figure}
 
-Gitt en graf $G=(V,E)$, er det mulig å fargelegge alle nodene med ett gitt
+Gitt en graf $G=(V,E)$, er det mulig å fargelegge alle nodene med ett
+gitt 
 sett $\phi={\{1, 2, 3, \ldots, n\}}$ farger, slik at ingen noder med
 lik farge er forbundet med en kant?
 For å gjøre oppsettet så enkelt som mulig velger vi  $n=3$.  Det er da
@@ -508,7 +515,7 @@ algoritmer.
 I forhold den massive innsatsen som må til for å svare på et problem
 fra \textsf{NPC} er det bagateller som skal til for å konvertere
 det til et annet.  I dag brukes det som bevis på at et problem er i
-\textsf{NPC} dersom det er mulig å ``skirve det om'' til ett av de
+\textsf{NPC} dersom det er mulig å ``skrive det om'' til ett av de
 andre problemene i settet.
 
 Vi skal benytte denne egenskapen senere.
@@ -522,9 +529,9 @@ Vi skal benytte denne egenskapen senere.
 
 Det lar seg ikke gjøre å bevise at kryptering fungerer.  Beste vikan
 få til er å bygge på noe som er ``vanskelig''.
-Deretter håpe på at implementasjonen ikke
-svekker de teoretiske antagelsene; nær 100\% av alle svakheter
-er knyttet til programvare heller enn teori.
+Deretter håpe på at implementasjonen ikke svekker de teoretiske
+antagelsene; nær 100\% av alle svakheter er knyttet til programvare
+heller enn teori.
 
 Shannon~\cite{Shannon1949Communication} skrev for et par generasjoner
 siden at engangs-krypto\footnote{På nynorsk \emph{one-time pad}.}
@@ -542,7 +549,7 @@ i møte med problemer med kompleksitet tilsvarende i \textsf{BPP}.
 
 Under antagelsen om at \textsc{Faktorisering} er utenfor
 \textsf{BPP}--selv om det dessverre ikke er noe som tyder på at det er
-i \textsf{NPC}--kan vi etablere asymmetrisk
+\emph{umulig} (det vil si i \textsf{NPC})--kan vi etablere asymmetrisk
 kryptering~\cite{Goldwasser1982probabilistic,Goldwasser1984Probabilistic}
 med interessante egenskaper (ut over hva \textsc{RSA} og \textsc{D-H}
 tilbyr).  I denne artikkelen er det kun konseptet om en sikker
@@ -563,35 +570,37 @@ at~\cite{stinson2026primer} er en god introduksjon.
 %
 \section{Problemstilling}
 
-Eksempelet med kortstokken vi seksjon~\ref{sec:bakgrunn} illustrerte
-essensen i en \textsc{Zero Knowledge-Protocol}.
+Eksempelet med kortstokken vi brukte i seksjon~\ref{sec:bakgrunn}
+viser essensen i en \textsc{Zero Knowledge-Protocol}.
 For bruk mellom datamaskiner hvor det ikke er aktuelt å sette seg ned
 ved bordet, og i særdeleshet for å formidle hemmeligheter, er det
 nødvendig med en noe mer komplisert omgivelse
 
 På et strukturelt nivå ønsker vi at Charlie, som lytter på
 kommunikasjonen mellom Alice og Bob, er i samme beregningsmessige
-posisjon etter å ha lytteat på protokollen mellom Alice og Bob som han
+posisjon etter å ha lyttet på protokollen mellom Alice og Bob som han
 var før protokollen startet.  Altså at kompleksiteten i å finne $x$
 ikke endrer seg gjennom å lytte mens Bob på sin side blir overbevist
 om at Alice kjenner $x$.
 
 Vi ønsker å finne et språk $\mathcal{L}$ som er slik at Alice kan
 overbevise Bob om at hun kjenner $x \in \mathcal{L}$ uten å formidle
-noe av 
-verdi om $x$.  Konkret:
+noe av  verdi om $x$.  Konkret:
 \begin{itemize}
-\item Dersom $x \in \mathcal{L}$ da kan Alice overbevise Bob om det med en
-  sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$, og
-\item Dersom $x \not\in \mathcal{L}$ da vil Bob kunne avvise at $x \in \mathcal{L}$ med en 
-  sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$.
+\item Dersom $x \in \mathcal{L}$ da kan Alice overbevise Bob om det
+  med en sannsynlighet $P > 1-{\lvert x \rvert}^c$ for enhver $c>0$,
+  og
+\item Dersom $x \not\in \mathcal{L}$ da vil Bob kunne avvise at $x \in
+  \mathcal{L}$ med en sannsynlighet $P > 1-{\lvert x \rvert}^c$ for
+  enhver $c>0$.
 \end{itemize}
 
 Vi kan senke sannsynligheten for at noen gjetter våre
-krypteringsnøkler ved å velge dem lange; vi husker at ``senke'' ikke
+krypteringsnøkler ved å velge dem lange; vi husker at ``senke'' ikke 
 medfører ``sette til 0''.  På sammen måte kan Bob senke
 sannsynligheten for at Alice lurer ham til et nivå han kan leve med.
 Motto er ``Tenk på et lite (nok) tall''.
+
 
 
 \subsection{Protokoll basert på \textsc{Grafisomorfi}}
@@ -620,8 +629,7 @@ Meldingene og beregningene er som følger:
 \begin{enumerate}
 \item[$M_1$] \APri{A} generer $H \cong G_1$.  Mappingen
   mellom $G_1$ og $H$ kaller vi \AVar{\phi_1} og mappingen mellom $G_2$
-  og $H$ 
-  kaller vi \AVar{\phi_2}.  \APri{A} sender $H$ til 
+  og $H$ kaller vi \AVar{\phi_2}.  \APri{A} sender $H$ til 
   \APri{B}.  \APri{C} ser kun en graf han mistenker er isomorf med
   $G_1$ men kan i praksis ikke verifisere at det er tilfelle (fordi
   \textsc{Grafisomorfi} ikke er i \textsf{BPP});
@@ -680,14 +688,14 @@ bevise det''.  Formålet er å overbevise ham, ikke sende ham en
 hemmelighet det kanskje viser seg at han ikke kjente til.  Videre, den
 lille protokollen presentert i Seksjon~\ref{sec:bakgrunn}
 (side~\pageref{sec:bakgrunn}) forutsetter digitale
-fingeravtrykk\footnote{Hashing} som i seg selv krever nye
-undersøkelser; vi skal derfor greie oss uten.
+fingeravtrykk\footnote{Hashing} som i seg selv krever nye og ikke
+ubetydelige undersøkelser; vi skal derfor greie oss uten.
 
 Denne gangen er hemmeligheten pakket inn som fargeleggingen av nodene
 i en graf; vi velger 3 farger uten tap av det generelle.
 Bob har publisert en graf $G=(VE)$ som han vet kan fargelegges;
-fargelkeggingen er hemmeligheten.  Alice ønsker å overbevise Bob om at
-hun kjenner hemmeligheten (fargeleggingen).
+fargeleggingen er hemmeligheten.  Alice ønsker å overbevise Bob om at
+hun kjenner hemmeligheten.
 
 Bob har laget farveleggingen $\phi: V \in \{1,2,3\}$ av grafen
 $G_B=(V,E)$.  Protokollen har tre meldinger, og gjentas til Bob er
@@ -760,9 +768,10 @@ Artikkelen identifiserer dermed en ny kompleksitetsklasse:
 \textsf{IP}.  Et språk $L$ er i \textsf{IP} dersom det finnes en
 protokoll som gjør et to krav er oppfylt:
 \begin{description}
-\item [Komplett:] Om $x \in L$ da kan Bob overbevise Alice, og
-\item [Trygg:] Om $x \not\in L$ da er det \emph{umulig} for Bob å
-  overbevise   Alice.
+\item [Komplett:] Om $x \in L$ da kan Alice overbevise Bob med en
+  sikkerhet (sannsynlighet) som Bob bestemmer, og
+\item [Trygg:] Om $x \not\in L$ da er det \emph{umulig} for Alice å
+  overbevise Bob. 
 \end{description}
 
 Satt sammen betyr det at:
@@ -772,15 +781,18 @@ Satt sammen betyr det at:
 Man kan finne dobbelt så mye som man ønsker å vite om denne relasjonen
 i \cite[kapittel 12.2]{papadimitriou1994computational}.
 
-Arbeidet utvides med ytterligere to teorem:
+Artikkelen utvides med ytterligere to teorem:
 \begin{enumerate}
 \item Det er mulig å konstruere en oversetter som tar en protokoll
   \textsc{P} beregnet på $n=2t+1$ ærlige deltagere og transformerer
-  den til en protokoll $P^\prime$ som oppnår det samme selv om $t$ av
-  $n$ deltagere nå er uærlige.  De uærlige kan avvike fra $P^\prime$ i
-  enhver, men polynomisk måte, og
-\item 
+  den til en protokoll \textsc{P'} som oppnår det samme selv om $t$ av
+  $n$ deltagere nå er uærlige.  De uærlige kan avvike fra \textsc{P'}
+  i enhver, men polynomisk måte, og
+\item Fordi alle problemene i \textsf{NPC} kanreduseres til hverandre,
+  kan alle problemer i \textsf{NPC} brukes til å bygge en
+  \textsc{Zero-Knowledge Protocol}.
 \end{enumerate}
+
 
 \bibliographystyle{plain}
 \bibliography{zero}
